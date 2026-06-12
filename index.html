@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Combo Roulette</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #0f0f12;
+        color: white;
+        text-align: center;
+        margin: 0;
+        padding: 20px;
+    }
+
+    h1 {
+        margin-bottom: 10px;
+    }
+
+    .card {
+        background: #1b1b22;
+        padding: 15px;
+        margin: 10px auto;
+        border-radius: 12px;
+        max-width: 500px;
+    }
+
+    input, button, select {
+        padding: 10px;
+        margin: 5px;
+        border-radius: 8px;
+        border: none;
+    }
+
+    button {
+        cursor: pointer;
+        background: #ff3d6e;
+        color: white;
+        font-weight: bold;
+    }
+
+    button:hover {
+        opacity: 0.8;
+    }
+
+    #wheelCanvas {
+        background: #111;
+        border-radius: 50%;
+        margin-top: 10px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .player {
+        margin: 5px;
+        padding: 5px;
+        background: #2a2a33;
+        border-radius: 8px;
+    }
+
+    .combo {
+        font-size: 20px;
+        margin: 10px 0;
+        color: #00ffd5;
+    }
+
+    .scoreboard {
+        text-align: left;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>🥋 Combo Roulette</h1>
+
+<div class="card" id="setup">
+    <h3>Players</h3>
+    <input id="playerName" placeholder="Enter player name"/>
+    <button onclick="addPlayer()">Add</button>
+
+    <div id="playerList"></div>
+
+    <h3>Settings</h3>
+    <select id="timer">
+        <option value="30">30s</option>
+        <option value="60">60s</option>
+        <option value="0">Unlimited</option>
+    </select>
+
+    <button onclick="startGame()">Start Game</button>
+</div>
+
+<div class="card hidden" id="game">
+
+    <h2>Round: <span id="round">1</span></h2>
+
+    <canvas id="wheelCanvas" width="300" height="300"></canvas>
+
+    <button onclick="spinWheel()">Spin Player</button>
+
+    <h3>Selected Player:</h3>
+    <div id="selectedPlayer">-</div>
+
+    <div class="combo" id="comboDisplay"></div>
+
+    <button onclick="generateCombo()">Generate Combo</button>
+
+    <h3>Timer</h3>
+    <div id="timerDisplay">-</div>
+
+    <button onclick="startTimer()">Start Timer</button>
+
+    <h3>Voting (1–10)</h3>
+    <div id="voteSection"></div>
+
+    <h3>Scoreboard</h3>
+    <div id="scores"></div>
+
+    <button onclick="nextRound()">Next Round</button>
+
+</div>
+
+<script>
+let players = [];
+let scores = {};
+let currentPlayer = "";
+let round = 1;
+let timerValue = 30;
+let timerInterval;
+
+const combos = [
+    "Jab → Cross → Front Kick",
+    "Jab → Jab → Roundhouse Kick",
+    "Front Kick → Spin → Punch",
+    "Block → Counter Punch → Kick",
+    "Roundhouse → Front Kick → Kiai",
+    "Jab → Low Kick → Spinning Kick",
+    "Fake → Step → Power Kick"
+];
+
+// ------------------ Players ------------------
+
+function addPlayer() {
+    const name = document.getElementById("playerName").value;
+    if (!name) return;
+
+    players.push(name);
+    scores[name] = 0;
+
+    document.getElementById("playerName").value = "";
+    renderPlayers();
+}
+
+function renderPlayers() {
+    const list = document.getElementById("playerList");
+    list.innerHTML = players.map(p => `<div class="player">${p}</div>`).join("");
+}
+
+// ------------------ Start Game ------------------
+
+function startGame() {
+    if (players.length < 2) {
+        alert("Need at least 2 players");
+        return;
+    }
+
+    timerValue = parseInt(document.getElementById("timer").value);
+
+    document.getElementById("setup").classList.add("hidden");
+    document.getElementById("game").classList.remove("hidden");
+
+    drawWheel();
+    updateScoreboard();
+}
+
+// ------------------ Wheel ------------------
+
+function drawWheel() {
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const center = 150;
+    const radius = 140;
+
+    ctx.clearRect(0, 0, 300, 300);
+
+    players.forEach((p, i) => {
+        const angle = (i / players.length) * 2 * Math.PI;
+
+        ctx.beginPath();
+        ctx.moveTo(center, center);
+        ctx.arc(center, center, radius, angle, angle + (2 * Math.PI / players.length));
+        ctx.fillStyle = i % 2 === 0 ? "#ff3d6e" : "#00ffd5";
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(angle + 0.2);
+        ctx.fillStyle = "black";
+        ctx.fillText(p, 80, 10);
+        ctx.restore();
+    });
+}
+
+// ------------------ Spin ------------------
+
+function spinWheel() {
+    if (players.length === 0) return;
+
+    const index = Math.floor(Math.random() * players.length);
+    currentPlayer = players[index];
+
+    document.getElementById("selectedPlayer").innerText = currentPlayer;
+
+    drawWheelHighlight(index);
+}
+
+function drawWheelHighlight(index) {
+    drawWheel();
+}
+
+// ------------------ Combo ------------------
+
+function generateCombo() {
+    const combo = combos[Math.floor(Math.random() * combos.length)];
+    document.getElementById("comboDisplay").innerText = combo;
+}
+
+// ------------------ Timer ------------------
+
+function startTimer() {
+    if (timerValue === 0) {
+        document.getElementById("timerDisplay").innerText = "∞";
+        return;
+    }
+
+    let time = timerValue;
+
+    clearInterval(timerInterval);
+
+    timerInterval = setInterval(() => {
+        document.getElementById("timerDisplay").innerText = time + "s";
+
+        time--;
+
+        if (time < 0) {
+            clearInterval(timerInterval);
+            document.getElementById("timerDisplay").innerText = "Time!";
+            showVoting();
+        }
+    }, 1000);
+}
+
+// ------------------ Voting ------------------
+
+function showVoting() {
+    const section = document.getElementById("voteSection");
+    section.innerHTML = "";
+
+    players.forEach(p => {
+        const btn = document.createElement("button");
+        btn.innerText = `Rate ${currentPlayer} (as ${p})`;
+        btn.onclick = () => vote(p);
+        section.appendChild(btn);
+    });
+}
+
+function vote(voter) {
+    const score = Math.floor(Math.random() * 10) + 1;
+    scores[currentPlayer] += score;
+
+    updateScoreboard();
+}
+
+// ------------------ Scoreboard ------------------
+
+function updateScoreboard() {
+    const board = document.getElementById("scores");
+
+    board.innerHTML = Object.entries(scores)
+        .map(([p, s]) => `<div>${p}: ${s}</div>`)
+        .join("");
+}
+
+// ------------------ Next Round ------------------
+
+function nextRound() {
+    round++;
+    document.getElementById("round").innerText = round;
+
+    document.getElementById("comboDisplay").innerText = "";
+    document.getElementById("selectedPlayer").innerText = "-";
+    document.getElementById("voteSection").innerHTML = "";
+}
+</script>
+
+</body>
+</html>
