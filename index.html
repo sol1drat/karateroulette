@@ -1,229 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Karate Roulette</title>
-<style>
-  :root {
-    --bg-dark: #0a0a0a;
-    --surface: #1a1a1a;
-    --text-main: #f4f4f4;
-    --text-muted: #888888;
-    --accent-red: #d32f2f;
-    --border-radius: 12px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-
-  body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  .screen {
-    display: none;
-    flex: 1;
-    padding: 24px;
-    flex-direction: column;
-    animation: fadeIn 0.3s ease;
-  }
-
-  .screen.active { display: flex; }
-
-  h1, h2 { text-transform: uppercase; letter-spacing: 2px; margin-bottom: 16px; text-align: center; }
-  
-  .input-group { display: flex; gap: 8px; margin-bottom: 24px; }
-  input[type="text"], input[type="number"] {
-    flex: 1; padding: 16px; border: 1px solid #333; background: var(--surface); color: white;
-    border-radius: var(--border-radius); font-size: 16px; outline: none;
-  }
-  input[type="text"]:focus { border-color: var(--accent-red); }
-
-  button {
-    background-color: var(--surface); color: var(--text-main);
-    border: 1px solid #333; padding: 16px 24px; border-radius: var(--border-radius);
-    font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s;
-    text-transform: uppercase; letter-spacing: 1px;
-  }
-  button.primary {
-    background-color: var(--accent-red); border-color: var(--accent-red); width: 100%;
-    margin-top: auto; /* Anchors to bottom */
-  }
-  button:active { transform: scale(0.98); }
-
-  .player-list { list-style: none; flex: 1; overflow-y: auto; }
-  .player-list li {
-    padding: 16px; background: var(--surface); margin-bottom: 8px; border-radius: var(--border-radius);
-    display: flex; justify-content: space-between; align-items: center; border-left: 4px solid var(--accent-red);
-  }
-
-  .combo-display {
-    font-size: 28px; font-weight: 800; text-align: center; margin: auto 0;
-    line-height: 1.5; color: var(--accent-red);
-  }
-
-  .slider-group { margin-bottom: 24px; }
-  .slider-group label { display: flex; justify-content: space-between; margin-bottom: 8px; color: var(--text-muted); }
-  input[type="range"] { width: 100%; accent-color: var(--accent-red); }
-
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karate Roulette</title>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
 
-  <div id="setupScreen" class="screen active">
-    <h1>Dojo Roster</h1>
-    <div class="input-group">
-      <input type="text" id="playerName" placeholder="Enter fighter name...">
-      <button onclick="addPlayer()">Add</button>
+    <audio id="spin-sound" src="https://file-examples-com.s3.amazonaws.com/wp-content/uploads/2017/11/file_example_WAV_1MG.wav" preload="auto"></audio>
+    <audio id="winner-sound" src="https://file-examples-com.s3.amazonaws.com/wp-content/uploads/2017/11/file_example_WAV_1MG.wav" preload="auto"></audio>
+    <audio id="score-submit-sound" src="https://file-examples-com.s3.amazonaws.com/wp-content/uploads/2017/11/file_example_WAV_1MG.wav" preload="auto"></audio>
+    <audio id="combo-reveal-sound" src="https://file-examples-com.s3.amazonaws.com/wp-content/uploads/2017/11/file_example_WAV_1MG.wav" preload="auto"></audio>
+
+    <div class="app-container">
+        <header class="app-header">
+            <img src="karate-logo.png" alt="Karate Roulette Logo" class="logo">
+            <h1>Karate Roulette</h1>
+            <p id="current-round">Round 1: 2 Moves</p>
+        </header>
+
+        <main id="game-stage">
+            <!-- Player Setup Phase -->
+            <section id="player-setup" class="game-phase">
+                <h2>Add Your Dojo Masters</h2>
+                <div class="player-input-group">
+                    <input type="text" id="player-name" placeholder="Enter Player Name">
+                    <select id="combo-time">
+                        <option value="30">30s</option>
+                        <option value="45">45s</option>
+                        <option value="60">60s</option>
+                        <option value="-1">Infinite</option>
+                    </select>
+                    <button id="add-player-btn" class="btn btn-primary">Add Player</button>
+                </div>
+                <ul id="player-list">
+                    <!-- Players will be added here -->
+                </ul>
+                <button id="start-roulette-btn" class="btn btn-secondary" disabled>Spin the Roulette!</button>
+            </section>
+
+            <!-- Roulette Spin Phase -->
+            <section id="roulette-spin" class="game-phase hidden">
+                <h2>Who's Up Next?</h2>
+                <div class="roulette-container">
+                    <div id="roulette-wheel">
+                        <!-- Player names will be dynamically loaded here -->
+                    </div>
+                    <div class="roulette-arrow"></div>
+                </div>
+                <p id="spinner-message">Spinning...</p>
+                <button id="spin-btn" class="btn btn-primary">Spin!</button>
+            </section>
+
+            <!-- Combo Reveal Phase -->
+            <section id="combo-reveal" class="game-phase hidden">
+                <h2 id="player-turn-name"></h2>
+                <p class="subtle-text">Your challenge:</p>
+                <div class="combo-display">
+                    <h3 id="current-combo"></h3>
+                </div>
+                <div id="timer-display">
+                    <span id="minutes">00</span>:<span id="seconds">00</span>
+                </div>
+                <button id="finished-btn" class="btn btn-secondary">Finished!</button>
+                <p id="combo-time-info"></p>
+            </section>
+
+            <!-- Scoring Phase -->
+            <section id="scoring-phase" class="game-phase hidden">
+                <h2 id="scoring-player-name"></h2>
+                <p class="subtle-text">Rate the performance:</p>
+                <div class="score-category">
+                    <h3>Accuracy</h3>
+                    <div class="rating-group" data-category="accuracy">
+                        <button class="score-btn" data-score="1">1</button>
+                        <button class="score-btn" data-score="2">2</button>
+                        <button class="score-btn" data-score="3">3</button>
+                        <button class="score-btn" data-score="4">4</button>
+                        <button class="score-btn" data-score="5">5</button>
+                    </div>
+                </div>
+                <div class="score-category">
+                    <h3>Power</h3>
+                    <div class="rating-group" data-category="power">
+                        <button class="score-btn" data-score="1">1</button>
+                        <button class="score-btn" data-score="2">2</button>
+                        <button class="score-btn" data-score="3">3</button>
+                        <button class="score-btn" data-score="4">4</button>
+                        <button class="score-btn" data-score="5">5</button>
+                    </div>
+                </div>
+                <div class="score-category">
+                    <h3>Style</h3>
+                    <div class="rating-group" data-category="style">
+                        <button class="score-btn" data-score="1">1</button>
+                        <button class="score-btn" data-score="2">2</button>
+                        <button class="score-btn" data-score="3">3</button>
+                        <button class="score-btn" data-score="4">4</button>
+                        <button class="score-btn" data-score="5">5</button>
+                    </div>
+                </div>
+                <button id="submit-scores-btn" class="btn btn-primary">Submit Scores</button>
+            </section>
+
+            <!-- Scoreboard Phase -->
+            <section id="scoreboard-phase" class="game-phase hidden">
+                <h2>Final Dojo Rankings</h2>
+                <table id="scoreboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Total Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Scores will be populated here -->
+                    </tbody>
+                </table>
+                <h3 id="winner-declaration"></h3>
+                <button id="play-again-btn" class="btn btn-secondary">Play Again</button>
+            </section>
+        </main>
     </div>
-    <ul id="players" class="player-list"></ul>
-    
-    <div class="input-group" style="margin-top: 16px;">
-      <input type="number" id="comboTime" placeholder="Time limit (sec) or leave blank">
+
+    <!-- Hidden element for storing combos -->
+    <div id="combos-data" style="display: none;">
+        <div data-moves="2">
+            <div data-combo="Heian Shodan">
+                <p>Forward Stance</p>
+                <p>Rising Block</p>
+            </div>
+            <div data-combo="Heian Nidan">
+                <p>Seoi-nage</p>
+                <p>Gedan Barai</p>
+            </div>
+            <div data-combo="Kihon Ippon Kumite 1">
+                <p>Chudan Tsuki</p>
+                <p>Age Uke</p>
+            </div>
+            <div data-combo="Kihon Ippon Kumite 2">
+                <p>Gedan Barai</p>
+                <p>Gyaku Tsuki</p>
+            </div>
+             <div data-combo="Basic Combo A">
+                <p>Front Kick</p>
+                <p>Reverse Punch</p>
+            </div>
+        </div>
+        <div data-moves="3">
+            <div data-combo="Heian Sandan">
+                <p>Jodan Tsuki</p>
+                <p>Gedan Barai</p>
+                <p>Soto Uke</p>
+            </div>
+            <div data-combo="Heian Yondan">
+                <p>Kizami Tsuki</p>
+                <p>Age Uke</p>
+                <p>Morotezuki</p>
+            </div>
+            <div data-combo="Advanced Combo 1">
+                <p>Roundhouse Kick</p>
+                <p>Block</p>
+                <p>Counter Punch</p>
+            </div>
+             <div data-combo="Flow Drill A">
+                <p>Step Forward</p>
+                <p>Inside Block</p>
+                <p>Side Kick</p>
+            </div>
+             <div data-combo="Sequence B">
+                <p>Low Sweep</p>
+                <p>Spinning Back fist</p>
+                <p>Elbow Strike</p>
+            </div>
+        </div>
+        <div data-moves="4">
+            <div data-combo="Heian Godan">
+                <p>Mae Geri Keage</p>
+                <p>Shuto Uchi</p>
+                <p>Uchi Uke</p>
+                <p>Gyaku Tsuki</p>
+            </div>
+            <div data-combo="Master's Technique">
+                <p>Side Step</p>
+                <p>Double Punch</p>
+                <p>Takedown Motion</p>
+                <p>Floor Sweep</p>
+            </div>
+             <div data-combo="Spirit of the Tiger">
+                <p>Tiger Claw</p>
+                <p>Jumping Knee</p>
+                <p>Nerve Strike</p>
+                <p>Leaping Kick</p>
+            </div>
+             <div data-combo="Dragon's Fury">
+                <p>Dragon Punch</p>
+                <p>Phoenix Dive</p>
+                <p>Serpent Strike</p>
+                <p>Eagle Talon</p>
+            </div>
+        </div>
     </div>
-    <button class="primary" onclick="startGame()">Start Tournament</button>
-  </div>
 
-  <div id="actionScreen" class="screen">
-    <h2 id="roundDisplay">Round 1</h2>
-    <p style="text-align: center; color: var(--text-muted);">Current Fighter</p>
-    <h1 id="currentFighter">---</h1>
-    
-    <div class="combo-display" id="comboMoves">Tap to Spin</div>
-    
-    <button class="primary" id="actionBtn" onclick="spinRoulette()">Spin Roulette</button>
-  </div>
-
-  <div id="scoringScreen" class="screen">
-    <h2>Judge <span id="scoringFighter" style="color: var(--accent-red)"></span></h2>
-    
-    <div class="slider-group">
-      <label><span>Accuracy</span> <span id="valAcc">5</span></label>
-      <input type="range" id="scoreAcc" min="1" max="10" value="5" oninput="document.getElementById('valAcc').innerText = this.value">
-    </div>
-    <div class="slider-group">
-      <label><span>Power</span> <span id="valPow">5</span></label>
-      <input type="range" id="scorePow" min="1" max="10" value="5" oninput="document.getElementById('valPow').innerText = this.value">
-    </div>
-    <div class="slider-group">
-      <label><span>Style</span> <span id="valSty">5</span></label>
-      <input type="range" id="scoreSty" min="1" max="10" value="5" oninput="document.getElementById('valSty').innerText = this.value">
-    </div>
-
-    <button class="primary" onclick="submitScore()">Submit Score</button>
-  </div>
-
-<script>
-  // Centralized State
-  const state = {
-    players: [],
-    timeLimit: null,
-    currentRound: 1,
-    currentPlayerIndex: 0,
-    scores: {} // { "Name": totalScore }
-  };
-
-  const moves = {
-    strikes: ["Jab", "Cross", "Hook", "Uppercut", "Backfist"],
-    kicks: ["Front Kick", "Roundhouse", "Side Kick", "Axe Kick"],
-    blocks: ["High Block", "Low Block"]
-  };
-
-  function switchScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-  }
-
-  function addPlayer() {
-    const input = document.getElementById('playerName');
-    const name = input.value.trim();
-    if (name && !state.players.includes(name)) {
-      state.players.push(name);
-      state.scores[name] = 0;
-      
-      const li = document.createElement('li');
-      li.innerText = name;
-      document.getElementById('players').appendChild(li);
-      input.value = '';
-    }
-  }
-
-  function startGame() {
-    if (state.players.length < 2) return alert("Need at least 2 fighters!");
-    state.timeLimit = document.getElementById('comboTime').value;
-    switchScreen('actionScreen');
-    setupTurn();
-  }
-
-  function setupTurn() {
-    document.getElementById('roundDisplay').innerText = `Round ${state.currentRound}`;
-    document.getElementById('currentFighter').innerText = state.players[state.currentPlayerIndex];
-    document.getElementById('comboMoves').innerText = "???";
-    
-    const btn = document.getElementById('actionBtn');
-    btn.innerText = "Spin Roulette";
-    btn.onclick = spinRoulette;
-  }
-
-  function spinRoulette() {
-    // Quick pseudo-animation
-    let ticks = 0;
-    const interval = setInterval(() => {
-      document.getElementById('comboMoves').innerText = generateCombo(state.currentRound + 1).join(" + ");
-      ticks++;
-      if (ticks > 15) {
-        clearInterval(interval);
-        startComboExecution();
-      }
-    }, 50);
-  }
-
-  function generateCombo(moveCount) {
-    const allMoves = [...moves.strikes, ...moves.kicks, ...moves.blocks];
-    let combo = [];
-    for(let i=0; i<moveCount; i++) {
-      combo.push(allMoves[Math.floor(Math.random() * allMoves.length)]);
-    }
-    return combo;
-  }
-
-  function startComboExecution() {
-    const btn = document.getElementById('actionBtn');
-    btn.innerText = "Combo Finished!";
-    btn.onclick = () => switchScreen('scoringScreen');
-    document.getElementById('scoringFighter').innerText = state.players[state.currentPlayerIndex];
-    // Timer logic could go here if state.timeLimit is set
-  }
-
-  function submitScore() {
-    const acc = parseInt(document.getElementById('scoreAcc').value);
-    const pow = parseInt(document.getElementById('scorePow').value);
-    const sty = parseInt(document.getElementById('scoreSty').value);
-    
-    const total = acc + pow + sty;
-    state.scores[state.players[state.currentPlayerIndex]] += total;
-
-    // Advance Turn
-    state.currentPlayerIndex++;
-    if (state.currentPlayerIndex >= state.players.length) {
-      state.currentPlayerIndex = 0;
-      state.currentRound++;
-      if (state.currentRound > 3) {
-        alert("Game Over! Check console for scores.");
-        console.log(state.scores);
-        // Implement Scoreboard Screen here
-        return;
-      }
-    }
-    switchScreen('actionScreen');
-    setupTurn();
-  }
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
