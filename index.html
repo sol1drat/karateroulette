@@ -1,211 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Karate Roulette</title>
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Karate Roulette 🥋</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 <body>
 
-    <audio id="spin-sound" src="https://file-examples-com.s3.amazonaws.com/wp-content/uploads/2017/11/file_example_WAV_1MG.wav" preload="auto"></audio>
-    <audio id="winner-sound" src="https://file-examples-com.s3.amazonaws.com/wp-content/uploads/2017/11/file_example_WAV_1MG.wav" preload="auto"></audio>
-    <audio id="score-submit-sound" src="https://file-examples-com.s3.amazonaws.com/wp-content/uploads/2017/11/file_example_WAV_1MG.wav" preload="auto"></audio>
-    <audio id="combo-reveal-sound" src="https://file-examples-com.s3.amazonaws.com/wp-content/uploads/2017/11/file_example_WAV_1MG.wav" preload="auto"></audio>
+  <!-- ===== SCREEN 1: SETUP ===== -->
+  <div id="screen-setup" class="screen active">
+    <div class="setup-bg"></div>
+    <div class="setup-content">
+      <header class="setup-header">
+        <div class="logo-mark">🥋</div>
+        <h1 class="logo-title">KARATE<br><span>ROULETTE</span></h1>
+        <p class="logo-sub">Step on the mat. Spin the wheel. Prove your power.</p>
+      </header>
 
-    <div class="app-container">
-        <header class="app-header">
-            <img src="karate-logo.png" alt="Karate Roulette Logo" class="logo">
-            <h1>Karate Roulette</h1>
-            <p id="current-round">Round 1: 2 Moves</p>
-        </header>
+      <div class="card setup-card">
+        <h2 class="card-title">PLAYERS</h2>
+        <div id="player-list" class="player-list"></div>
+        <div class="add-player-row">
+          <input type="text" id="player-input" class="input-field" placeholder="Enter fighter name…" maxlength="20" />
+          <button class="btn btn-add" id="add-player-btn">ADD</button>
+        </div>
+      </div>
 
-        <main id="game-stage">
-            <!-- Player Setup Phase -->
-            <section id="player-setup" class="game-phase">
-                <h2>Add Your Dojo Masters</h2>
-                <div class="player-input-group">
-                    <input type="text" id="player-name" placeholder="Enter Player Name">
-                    <select id="combo-time">
-                        <option value="30">30s</option>
-                        <option value="45">45s</option>
-                        <option value="60">60s</option>
-                        <option value="-1">Infinite</option>
-                    </select>
-                    <button id="add-player-btn" class="btn btn-primary">Add Player</button>
-                </div>
-                <ul id="player-list">
-                    <!-- Players will be added here -->
-                </ul>
-                <button id="start-roulette-btn" class="btn btn-secondary" disabled>Spin the Roulette!</button>
-            </section>
+      <div class="card setup-card">
+        <h2 class="card-title">COMBO TIME</h2>
+        <div class="time-options" id="time-options">
+          <button class="time-btn active" data-seconds="30">30s</button>
+          <button class="time-btn" data-seconds="45">45s</button>
+          <button class="time-btn" data-seconds="60">60s</button>
+          <button class="time-btn" data-seconds="0">∞</button>
+        </div>
+        <p class="time-hint" id="time-hint">30 seconds per combo</p>
+      </div>
 
-            <!-- Roulette Spin Phase -->
-            <section id="roulette-spin" class="game-phase hidden">
-                <h2>Who's Up Next?</h2>
-                <div class="roulette-container">
-                    <div id="roulette-wheel">
-                        <!-- Player names will be dynamically loaded here -->
-                    </div>
-                    <div class="roulette-arrow"></div>
-                </div>
-                <p id="spinner-message">Spinning...</p>
-                <button id="spin-btn" class="btn btn-primary">Spin!</button>
-            </section>
+      <div class="card setup-card rounds-info-card">
+        <h2 class="card-title">HOW IT WORKS</h2>
+        <div class="how-it-works">
+          <div class="hiw-item"><span class="hiw-belt belt-white"></span><span>Round 1 — 2-move combos</span></div>
+          <div class="hiw-item"><span class="hiw-belt belt-yellow"></span><span>Round 2 — 3-move combos</span></div>
+          <div class="hiw-item"><span class="hiw-belt belt-red"></span><span>Round 3 — 4-move combos</span></div>
+        </div>
+      </div>
 
-            <!-- Combo Reveal Phase -->
-            <section id="combo-reveal" class="game-phase hidden">
-                <h2 id="player-turn-name"></h2>
-                <p class="subtle-text">Your challenge:</p>
-                <div class="combo-display">
-                    <h3 id="current-combo"></h3>
-                </div>
-                <div id="timer-display">
-                    <span id="minutes">00</span>:<span id="seconds">00</span>
-                </div>
-                <button id="finished-btn" class="btn btn-secondary">Finished!</button>
-                <p id="combo-time-info"></p>
-            </section>
-
-            <!-- Scoring Phase -->
-            <section id="scoring-phase" class="game-phase hidden">
-                <h2 id="scoring-player-name"></h2>
-                <p class="subtle-text">Rate the performance:</p>
-                <div class="score-category">
-                    <h3>Accuracy</h3>
-                    <div class="rating-group" data-category="accuracy">
-                        <button class="score-btn" data-score="1">1</button>
-                        <button class="score-btn" data-score="2">2</button>
-                        <button class="score-btn" data-score="3">3</button>
-                        <button class="score-btn" data-score="4">4</button>
-                        <button class="score-btn" data-score="5">5</button>
-                    </div>
-                </div>
-                <div class="score-category">
-                    <h3>Power</h3>
-                    <div class="rating-group" data-category="power">
-                        <button class="score-btn" data-score="1">1</button>
-                        <button class="score-btn" data-score="2">2</button>
-                        <button class="score-btn" data-score="3">3</button>
-                        <button class="score-btn" data-score="4">4</button>
-                        <button class="score-btn" data-score="5">5</button>
-                    </div>
-                </div>
-                <div class="score-category">
-                    <h3>Style</h3>
-                    <div class="rating-group" data-category="style">
-                        <button class="score-btn" data-score="1">1</button>
-                        <button class="score-btn" data-score="2">2</button>
-                        <button class="score-btn" data-score="3">3</button>
-                        <button class="score-btn" data-score="4">4</button>
-                        <button class="score-btn" data-score="5">5</button>
-                    </div>
-                </div>
-                <button id="submit-scores-btn" class="btn btn-primary">Submit Scores</button>
-            </section>
-
-            <!-- Scoreboard Phase -->
-            <section id="scoreboard-phase" class="game-phase hidden">
-                <h2>Final Dojo Rankings</h2>
-                <table id="scoreboard-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Player</th>
-                            <th>Total Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Scores will be populated here -->
-                    </tbody>
-                </table>
-                <h3 id="winner-declaration"></h3>
-                <button id="play-again-btn" class="btn btn-secondary">Play Again</button>
-            </section>
-        </main>
+      <button class="btn btn-start" id="start-btn" disabled>BEGIN TRAINING</button>
     </div>
+  </div>
 
-    <!-- Hidden element for storing combos -->
-    <div id="combos-data" style="display: none;">
-        <div data-moves="2">
-            <div data-combo="Heian Shodan">
-                <p>Forward Stance</p>
-                <p>Rising Block</p>
-            </div>
-            <div data-combo="Heian Nidan">
-                <p>Seoi-nage</p>
-                <p>Gedan Barai</p>
-            </div>
-            <div data-combo="Kihon Ippon Kumite 1">
-                <p>Chudan Tsuki</p>
-                <p>Age Uke</p>
-            </div>
-            <div data-combo="Kihon Ippon Kumite 2">
-                <p>Gedan Barai</p>
-                <p>Gyaku Tsuki</p>
-            </div>
-             <div data-combo="Basic Combo A">
-                <p>Front Kick</p>
-                <p>Reverse Punch</p>
-            </div>
-        </div>
-        <div data-moves="3">
-            <div data-combo="Heian Sandan">
-                <p>Jodan Tsuki</p>
-                <p>Gedan Barai</p>
-                <p>Soto Uke</p>
-            </div>
-            <div data-combo="Heian Yondan">
-                <p>Kizami Tsuki</p>
-                <p>Age Uke</p>
-                <p>Morotezuki</p>
-            </div>
-            <div data-combo="Advanced Combo 1">
-                <p>Roundhouse Kick</p>
-                <p>Block</p>
-                <p>Counter Punch</p>
-            </div>
-             <div data-combo="Flow Drill A">
-                <p>Step Forward</p>
-                <p>Inside Block</p>
-                <p>Side Kick</p>
-            </div>
-             <div data-combo="Sequence B">
-                <p>Low Sweep</p>
-                <p>Spinning Back fist</p>
-                <p>Elbow Strike</p>
-            </div>
-        </div>
-        <div data-moves="4">
-            <div data-combo="Heian Godan">
-                <p>Mae Geri Keage</p>
-                <p>Shuto Uchi</p>
-                <p>Uchi Uke</p>
-                <p>Gyaku Tsuki</p>
-            </div>
-            <div data-combo="Master's Technique">
-                <p>Side Step</p>
-                <p>Double Punch</p>
-                <p>Takedown Motion</p>
-                <p>Floor Sweep</p>
-            </div>
-             <div data-combo="Spirit of the Tiger">
-                <p>Tiger Claw</p>
-                <p>Jumping Knee</p>
-                <p>Nerve Strike</p>
-                <p>Leaping Kick</p>
-            </div>
-             <div data-combo="Dragon's Fury">
-                <p>Dragon Punch</p>
-                <p>Phoenix Dive</p>
-                <p>Serpent Strike</p>
-                <p>Eagle Talon</p>
-            </div>
-        </div>
+  <!-- ===== SCREEN 2: PLAYER ROULETTE ===== -->
+  <div id="screen-player-roulette" class="screen">
+    <div class="roulette-bg"></div>
+    <div class="roulette-content">
+      <div class="round-badge" id="round-badge">ROUND 1</div>
+      <h2 class="roulette-title">WHO FIGHTS<br>NEXT?</h2>
+      <div class="wheel-container">
+        <div class="wheel-pointer">▼</div>
+        <canvas id="player-wheel" width="320" height="320"></canvas>
+        <div class="wheel-center-cap">🥋</div>
+      </div>
+      <button class="btn btn-spin" id="spin-player-btn">SPIN!</button>
+      <p class="spin-note" id="spin-status">Tap SPIN to choose a fighter</p>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- ===== SCREEN 3: PLAYER CHOSEN ===== -->
+  <div id="screen-player-chosen" class="screen">
+    <div class="chosen-bg"></div>
+    <div class="chosen-content">
+      <p class="chosen-label">FIGHTER SELECTED</p>
+      <div class="chosen-avatar" id="chosen-avatar">🥷</div>
+      <h1 class="chosen-name" id="chosen-name">YUKI</h1>
+      <div class="chosen-belt" id="chosen-belt"></div>
+      <p class="chosen-sub">Get ready to receive your combo!</p>
+      <button class="btn btn-primary" id="goto-combo-btn">REVEAL COMBO ▶</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 4: COMBO ROULETTE ===== -->
+  <div id="screen-combo-roulette" class="screen">
+    <div class="roulette-bg"></div>
+    <div class="roulette-content">
+      <div class="round-badge" id="combo-round-badge">ROUND 1</div>
+      <h2 class="roulette-title">YOUR COMBO<br>AWAITS!</h2>
+      <div class="slot-machine" id="slot-machine">
+        <div class="slot-reel" id="slot-1"><span>?</span></div>
+        <div class="slot-connector" id="conn-1">+</div>
+        <div class="slot-reel" id="slot-2"><span>?</span></div>
+        <div class="slot-connector hidden" id="conn-2">+</div>
+        <div class="slot-reel hidden" id="slot-3"><span>?</span></div>
+        <div class="slot-connector hidden" id="conn-3">+</div>
+        <div class="slot-reel hidden" id="slot-4"><span>?</span></div>
+      </div>
+      <button class="btn btn-spin" id="spin-combo-btn">SPIN COMBO!</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 5: PERFORM ===== -->
+  <div id="screen-perform" class="screen">
+    <div class="perform-bg"></div>
+    <div class="perform-content">
+      <p class="perform-fighter-label">FIGHTER</p>
+      <h1 class="perform-name" id="perform-name">YUKI</h1>
+
+      <div class="combo-display" id="combo-display"></div>
+
+      <div class="timer-ring-container" id="timer-container">
+        <svg class="timer-ring" viewBox="0 0 120 120">
+          <circle class="timer-track" cx="60" cy="60" r="52"/>
+          <circle class="timer-progress" id="timer-circle" cx="60" cy="60" r="52"/>
+        </svg>
+        <div class="timer-inner">
+          <span class="timer-num" id="timer-num">30</span>
+          <span class="timer-sec">sec</span>
+        </div>
+      </div>
+
+      <div id="infinity-badge" class="infinity-badge hidden">∞ No Time Limit</div>
+
+      <button class="btn btn-done" id="done-btn">✓ FINISHED!</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 6: SCORING ===== -->
+  <div id="screen-scoring" class="screen">
+    <div class="scoring-bg"></div>
+    <div class="scoring-content">
+      <p class="scoring-label">RATE THE FIGHTER</p>
+      <h1 class="scoring-name" id="scoring-name">YUKI</h1>
+      <p class="scoring-sub">Judges, cast your votes!</p>
+
+      <div class="scoring-categories">
+        <div class="score-cat" data-cat="accuracy">
+          <div class="score-cat-header">
+            <span class="score-icon">🎯</span>
+            <span class="score-cat-name">ACCURACY</span>
+          </div>
+          <div class="score-stars" id="stars-accuracy" data-cat="accuracy">
+            <span class="star" data-val="1">★</span>
+            <span class="star" data-val="2">★</span>
+            <span class="star" data-val="3">★</span>
+            <span class="star" data-val="4">★</span>
+            <span class="star" data-val="5">★</span>
+          </div>
+        </div>
+        <div class="score-cat" data-cat="power">
+          <div class="score-cat-header">
+            <span class="score-icon">💥</span>
+            <span class="score-cat-name">POWER</span>
+          </div>
+          <div class="score-stars" id="stars-power" data-cat="power">
+            <span class="star" data-val="1">★</span>
+            <span class="star" data-val="2">★</span>
+            <span class="star" data-val="3">★</span>
+            <span class="star" data-val="4">★</span>
+            <span class="star" data-val="5">★</span>
+          </div>
+        </div>
+        <div class="score-cat" data-cat="style">
+          <div class="score-cat-header">
+            <span class="score-icon">🌀</span>
+            <span class="score-cat-name">STYLE</span>
+          </div>
+          <div class="score-stars" id="stars-style" data-cat="style">
+            <span class="star" data-val="1">★</span>
+            <span class="star" data-val="2">★</span>
+            <span class="star" data-val="3">★</span>
+            <span class="star" data-val="4">★</span>
+            <span class="star" data-val="5">★</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="score-total-display">
+        <span class="score-total-label">TOTAL SCORE</span>
+        <span class="score-total-val" id="score-total-val">–</span>
+        <span class="score-total-max">/ 15</span>
+      </div>
+
+      <div class="bonus-section">
+        <p class="bonus-label">BONUS VOTES</p>
+        <div class="bonus-btns">
+          <button class="bonus-btn" id="bonus-kiai" title="Kiai Spirit">🔊 KIAI SPIRIT +1</button>
+          <button class="bonus-btn" id="bonus-perfect" title="Perfect Form">⚡ PERFECT FORM +2</button>
+          <button class="bonus-btn" id="bonus-sensei" title="Sensei's Nod">🏅 SENSEI'S NOD +3</button>
+        </div>
+        <p class="bonus-hint" id="bonus-hint"></p>
+      </div>
+
+      <button class="btn btn-primary btn-submit-score" id="submit-score-btn" disabled>SUBMIT SCORE</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 7: ROUND SUMMARY ===== -->
+  <div id="screen-round-summary" class="screen">
+    <div class="summary-bg"></div>
+    <div class="summary-content">
+      <div class="round-badge" id="summary-round-badge">ROUND 1 COMPLETE</div>
+      <h2 class="summary-title">ROUND<br>RESULTS</h2>
+      <div class="summary-board" id="summary-board"></div>
+      <button class="btn btn-primary" id="next-round-btn">NEXT ROUND ▶</button>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN 8: FINAL SCOREBOARD ===== -->
+  <div id="screen-final" class="screen">
+    <div class="final-bg"></div>
+    <div class="final-content">
+      <div class="winner-crown">👑</div>
+      <h1 class="final-winner-name" id="final-winner-name">YUKI</h1>
+      <p class="final-winner-sub">Champion of the Dojo</p>
+      <div class="final-board" id="final-board"></div>
+      <button class="btn btn-start" id="play-again-btn">PLAY AGAIN</button>
+    </div>
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div id="toast" class="toast"></div>
+
+  <script src="game.js"></script>
 </body>
 </html>
