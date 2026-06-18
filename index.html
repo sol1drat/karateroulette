@@ -2,228 +2,231 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Karate Roulette 🥋</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Karate Roulette — spin the wheel, draw your combo, and let your friends judge your form, power, and style." />
+  <title>Karate Roulette</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./css/styles.css" />
 </head>
 <body>
+  <!-- Decorative kanji watermark -->
+  <div class="bg-kanji" aria-hidden="true">道</div>
 
-  <!-- ===== SCREEN 1: SETUP ===== -->
-  <div id="screen-setup" class="screen active">
-    <div class="setup-bg"></div>
-    <div class="setup-content">
-      <header class="setup-header">
-        <div class="logo-mark">🥋</div>
-        <h1 class="logo-title">KARATE<br><span>ROULETTE</span></h1>
-        <p class="logo-sub">Step on the mat. Spin the wheel. Prove your power.</p>
+  <main id="app" class="app">
+
+    <!-- ============= SETUP SCREEN ============= -->
+    <section id="screen-setup" class="screen is-active">
+      <header class="screen__head">
+        <div class="logo">
+          <span class="logo__kanji">空手</span>
+          <h1 class="logo__title">Karate Roulette</h1>
+          <p class="logo__subtitle">Spin. Strike. Get scored.</p>
+        </div>
       </header>
 
-      <div class="card setup-card">
-        <h2 class="card-title">PLAYERS</h2>
-        <div id="player-list" class="player-list"></div>
-        <div class="add-player-row">
-          <input type="text" id="player-input" class="input-field" placeholder="Enter fighter name…" maxlength="20" />
-          <button class="btn btn-add" id="add-player-btn">ADD</button>
-        </div>
-      </div>
-
-      <div class="card setup-card">
-        <h2 class="card-title">COMBO TIME</h2>
-        <div class="time-options" id="time-options">
-          <button class="time-btn active" data-seconds="30">30s</button>
-          <button class="time-btn" data-seconds="45">45s</button>
-          <button class="time-btn" data-seconds="60">60s</button>
-          <button class="time-btn" data-seconds="0">∞</button>
-        </div>
-        <p class="time-hint" id="time-hint">30 seconds per combo</p>
-      </div>
-
-      <div class="card setup-card rounds-info-card">
-        <h2 class="card-title">HOW IT WORKS</h2>
-        <div class="how-it-works">
-          <div class="hiw-item"><span class="hiw-belt belt-white"></span><span>Round 1 — 2-move combos</span></div>
-          <div class="hiw-item"><span class="hiw-belt belt-yellow"></span><span>Round 2 — 3-move combos</span></div>
-          <div class="hiw-item"><span class="hiw-belt belt-red"></span><span>Round 3 — 4-move combos</span></div>
-        </div>
-      </div>
-
-      <button class="btn btn-start" id="start-btn" disabled>BEGIN TRAINING</button>
-    </div>
-  </div>
-
-  <!-- ===== SCREEN 2: PLAYER ROULETTE ===== -->
-  <div id="screen-player-roulette" class="screen">
-    <div class="roulette-bg"></div>
-    <div class="roulette-content">
-      <div class="round-badge" id="round-badge">ROUND 1</div>
-      <h2 class="roulette-title">WHO FIGHTS<br>NEXT?</h2>
-      <div class="wheel-container">
-        <div class="wheel-pointer">▼</div>
-        <canvas id="player-wheel" width="320" height="320"></canvas>
-        <div class="wheel-center-cap">🥋</div>
-      </div>
-      <button class="btn btn-spin" id="spin-player-btn">SPIN!</button>
-      <p class="spin-note" id="spin-status">Tap SPIN to choose a fighter</p>
-    </div>
-  </div>
-
-  <!-- ===== SCREEN 3: PLAYER CHOSEN ===== -->
-  <div id="screen-player-chosen" class="screen">
-    <div class="chosen-bg"></div>
-    <div class="chosen-content">
-      <p class="chosen-label">FIGHTER SELECTED</p>
-      <div class="chosen-avatar" id="chosen-avatar">🥷</div>
-      <h1 class="chosen-name" id="chosen-name">YUKI</h1>
-      <div class="chosen-belt" id="chosen-belt"></div>
-      <p class="chosen-sub">Get ready to receive your combo!</p>
-      <button class="btn btn-primary" id="goto-combo-btn">REVEAL COMBO ▶</button>
-    </div>
-  </div>
-
-  <!-- ===== SCREEN 4: COMBO ROULETTE ===== -->
-  <div id="screen-combo-roulette" class="screen">
-    <div class="roulette-bg"></div>
-    <div class="roulette-content">
-      <div class="round-badge" id="combo-round-badge">ROUND 1</div>
-      <h2 class="roulette-title">YOUR COMBO<br>AWAITS!</h2>
-      <div class="slot-machine" id="slot-machine">
-        <div class="slot-reel" id="slot-1"><span>?</span></div>
-        <div class="slot-connector" id="conn-1">+</div>
-        <div class="slot-reel" id="slot-2"><span>?</span></div>
-        <div class="slot-connector hidden" id="conn-2">+</div>
-        <div class="slot-reel hidden" id="slot-3"><span>?</span></div>
-        <div class="slot-connector hidden" id="conn-3">+</div>
-        <div class="slot-reel hidden" id="slot-4"><span>?</span></div>
-      </div>
-      <button class="btn btn-spin" id="spin-combo-btn">SPIN COMBO!</button>
-    </div>
-  </div>
-
-  <!-- ===== SCREEN 5: PERFORM ===== -->
-  <div id="screen-perform" class="screen">
-    <div class="perform-bg"></div>
-    <div class="perform-content">
-      <p class="perform-fighter-label">FIGHTER</p>
-      <h1 class="perform-name" id="perform-name">YUKI</h1>
-
-      <div class="combo-display" id="combo-display"></div>
-
-      <div class="timer-ring-container" id="timer-container">
-        <svg class="timer-ring" viewBox="0 0 120 120">
-          <circle class="timer-track" cx="60" cy="60" r="52"/>
-          <circle class="timer-progress" id="timer-circle" cx="60" cy="60" r="52"/>
-        </svg>
-        <div class="timer-inner">
-          <span class="timer-num" id="timer-num">30</span>
-          <span class="timer-sec">sec</span>
-        </div>
-      </div>
-
-      <div id="infinity-badge" class="infinity-badge hidden">∞ No Time Limit</div>
-
-      <button class="btn btn-done" id="done-btn">✓ FINISHED!</button>
-    </div>
-  </div>
-
-  <!-- ===== SCREEN 6: SCORING ===== -->
-  <div id="screen-scoring" class="screen">
-    <div class="scoring-bg"></div>
-    <div class="scoring-content">
-      <p class="scoring-label">RATE THE FIGHTER</p>
-      <h1 class="scoring-name" id="scoring-name">YUKI</h1>
-      <p class="scoring-sub">Judges, cast your votes!</p>
-
-      <div class="scoring-categories">
-        <div class="score-cat" data-cat="accuracy">
-          <div class="score-cat-header">
-            <span class="score-icon">🎯</span>
-            <span class="score-cat-name">ACCURACY</span>
+      <div class="setup">
+        <div class="card">
+          <div class="card__head">
+            <h2 class="card__title">Fighters</h2>
+            <span class="card__hint" id="player-count">0 added</span>
           </div>
-          <div class="score-stars" id="stars-accuracy" data-cat="accuracy">
-            <span class="star" data-val="1">★</span>
-            <span class="star" data-val="2">★</span>
-            <span class="star" data-val="3">★</span>
-            <span class="star" data-val="4">★</span>
-            <span class="star" data-val="5">★</span>
+
+          <form id="add-player-form" class="add-player" autocomplete="off">
+            <input
+              id="player-name-input"
+              class="input"
+              type="text"
+              placeholder="Enter fighter name"
+              maxlength="16"
+              aria-label="Fighter name"
+            />
+            <button type="submit" class="btn btn--icon" aria-label="Add fighter">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+          </form>
+
+          <ul id="player-list" class="player-list" aria-live="polite"></ul>
+
+          <p id="player-empty" class="empty-state">Add at least 2 fighters to begin.</p>
+        </div>
+
+        <div class="card">
+          <div class="card__head">
+            <h2 class="card__title">Combo Time</h2>
+            <span class="card__hint">Per performer</span>
+          </div>
+          <p class="card__desc">How long should each fighter have to complete their combo?</p>
+          <div class="time-options" id="time-options" role="radiogroup" aria-label="Combo time">
+            <button class="time-chip" role="radio" aria-checked="false" data-time="10">10s</button>
+            <button class="time-chip" role="radio" aria-checked="false" data-time="20">20s</button>
+            <button class="time-chip is-active" role="radio" aria-checked="true" data-time="30">30s</button>
+            <button class="time-chip" role="radio" aria-checked="false" data-time="45">45s</button>
+            <button class="time-chip" role="radio" aria-checked="false" data-time="60">60s</button>
+            <button class="time-chip" role="radio" aria-checked="false" data-time="0">∞</button>
           </div>
         </div>
-        <div class="score-cat" data-cat="power">
-          <div class="score-cat-header">
-            <span class="score-icon">💥</span>
-            <span class="score-cat-name">POWER</span>
-          </div>
-          <div class="score-stars" id="stars-power" data-cat="power">
-            <span class="star" data-val="1">★</span>
-            <span class="star" data-val="2">★</span>
-            <span class="star" data-val="3">★</span>
-            <span class="star" data-val="4">★</span>
-            <span class="star" data-val="5">★</span>
-          </div>
-        </div>
-        <div class="score-cat" data-cat="style">
-          <div class="score-cat-header">
-            <span class="score-icon">🌀</span>
-            <span class="score-cat-name">STYLE</span>
-          </div>
-          <div class="score-stars" id="stars-style" data-cat="style">
-            <span class="star" data-val="1">★</span>
-            <span class="star" data-val="2">★</span>
-            <span class="star" data-val="3">★</span>
-            <span class="star" data-val="4">★</span>
-            <span class="star" data-val="5">★</span>
-          </div>
+
+        <div class="card card--info">
+          <h3 class="info-title">How it works</h3>
+          <ol class="info-list">
+            <li><span class="info-num">1</span> The roulette picks a random fighter.</li>
+            <li><span class="info-num">2</span> A random karate combo is drawn for them.</li>
+            <li><span class="info-num">3</span> They perform. Everyone else scores Accuracy, Power &amp; Style.</li>
+            <li><span class="info-num">4</span> 3 rounds — combos grow from 2 → 3 → 4 moves.</li>
+            <li><span class="info-num">5</span> Highest total wins. Earn belts along the way.</li>
+          </ol>
         </div>
       </div>
 
-      <div class="score-total-display">
-        <span class="score-total-label">TOTAL SCORE</span>
-        <span class="score-total-val" id="score-total-val">–</span>
-        <span class="score-total-max">/ 15</span>
-      </div>
+      <footer class="screen__foot">
+        <button id="start-game" class="btn btn--primary btn--block" disabled>Begin the Match</button>
+      </footer>
+    </section>
 
-      <div class="bonus-section">
-        <p class="bonus-label">BONUS VOTES</p>
-        <div class="bonus-btns">
-          <button class="bonus-btn" id="bonus-kiai" title="Kiai Spirit">🔊 KIAI SPIRIT +1</button>
-          <button class="bonus-btn" id="bonus-perfect" title="Perfect Form">⚡ PERFECT FORM +2</button>
-          <button class="bonus-btn" id="bonus-sensei" title="Sensei's Nod">🏅 SENSEI'S NOD +3</button>
+    <!-- ============= ROUND INTRO SCREEN ============= -->
+    <section id="screen-round-intro" class="screen">
+      <div class="round-intro">
+        <p class="round-eyebrow" id="round-eyebrow">Round 1 of 3</p>
+        <h2 class="round-title" id="round-title">Foundation</h2>
+        <div class="round-moves">
+          <span class="round-moves__num" id="round-moves-num">2</span>
+          <span class="round-moves__label">moves per combo</span>
         </div>
-        <p class="bonus-hint" id="bonus-hint"></p>
+        <p class="round-desc" id="round-desc">Short, sharp combinations. Focus on form.</p>
+        <button id="round-start" class="btn btn--primary btn--block">Start Round</button>
       </div>
+    </section>
 
-      <button class="btn btn-primary btn-submit-score" id="submit-score-btn" disabled>SUBMIT SCORE</button>
-    </div>
-  </div>
+    <!-- ============= ROULETTE SCREEN ============= -->
+    <section id="screen-roulette" class="screen">
+      <header class="screen__head screen__head--center">
+        <p class="eyebrow" id="roulette-round-label">Round 1</p>
+        <h2 class="screen__title">Spinning for a fighter…</h2>
+      </header>
+      <div class="roulette-wrap">
+        <div class="roulette-pointer"></div>
+        <canvas id="roulette-canvas" width="640" height="640" aria-label="Roulette wheel"></canvas>
+        <div class="roulette-pulse" aria-hidden="true"></div>
+      </div>
+      <p class="roulette-status" id="roulette-status">Tap to spin!</p>
+      <footer class="screen__foot">
+        <button id="spin-btn" class="btn btn--primary btn--block btn--lg">SPIN</button>
+      </footer>
+    </section>
 
-  <!-- ===== SCREEN 7: ROUND SUMMARY ===== -->
-  <div id="screen-round-summary" class="screen">
-    <div class="summary-bg"></div>
-    <div class="summary-content">
-      <div class="round-badge" id="summary-round-badge">ROUND 1 COMPLETE</div>
-      <h2 class="summary-title">ROUND<br>RESULTS</h2>
-      <div class="summary-board" id="summary-board"></div>
-      <button class="btn btn-primary" id="next-round-btn">NEXT ROUND ▶</button>
-    </div>
-  </div>
+    <!-- ============= COMBO REVEAL SCREEN ============= -->
+    <section id="screen-combo" class="screen">
+      <header class="screen__head screen__head--center">
+        <p class="eyebrow" id="combo-fighter-name">Fighter</p>
+        <h2 class="screen__title">Your combo</h2>
+      </header>
+      <div class="combo-display">
+        <div class="combo-difficulty" id="combo-difficulty"></div>
+        <ol id="combo-moves" class="combo-moves"></ol>
+        <div class="combo-name" id="combo-name"></div>
+      </div>
+      <footer class="screen__foot">
+        <button id="combo-ready" class="btn btn--primary btn--block btn--lg">I'm Ready!</button>
+      </footer>
+    </section>
 
-  <!-- ===== SCREEN 8: FINAL SCOREBOARD ===== -->
-  <div id="screen-final" class="screen">
-    <div class="final-bg"></div>
-    <div class="final-content">
-      <div class="winner-crown">👑</div>
-      <h1 class="final-winner-name" id="final-winner-name">YUKI</h1>
-      <p class="final-winner-sub">Champion of the Dojo</p>
-      <div class="final-board" id="final-board"></div>
-      <button class="btn btn-start" id="play-again-btn">PLAY AGAIN</button>
-    </div>
-  </div>
+    <!-- ============= PERFORMANCE SCREEN ============= -->
+    <section id="screen-perform" class="screen">
+      <header class="screen__head screen__head--center">
+        <p class="eyebrow" id="perform-fighter">Fighter</p>
+        <h2 class="screen__title">Perform now!</h2>
+      </header>
+      <div class="perform-timer">
+        <div class="timer-ring">
+          <svg viewBox="0 0 200 200" aria-hidden="true">
+            <circle class="timer-ring__bg" cx="100" cy="100" r="92" />
+            <circle class="timer-ring__progress" id="timer-progress" cx="100" cy="100" r="92" />
+          </svg>
+          <div class="timer-ring__label" id="timer-label">30</div>
+        </div>
+      </div>
+      <ol id="perform-moves" class="combo-moves combo-moves--compact"></ol>
+      <footer class="screen__foot">
+        <button id="perform-done" class="btn btn--primary btn--block btn--lg">Finished!</button>
+      </footer>
+    </section>
 
-  <!-- ===== TOAST ===== -->
-  <div id="toast" class="toast"></div>
+    <!-- ============= PASS PHONE SCREEN ============= -->
+    <section id="screen-pass" class="screen">
+      <div class="pass">
+        <div class="pass__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="3"/><path d="M11 18h2"/></svg>
+        </div>
+        <p class="pass__eyebrow">Pass the phone</p>
+        <h2 class="pass__judge" id="pass-judge-name">Judge Name</h2>
+        <p class="pass__desc">It's your turn to score <strong id="pass-performer-name">Fighter</strong>.</p>
+        <button id="pass-ready" class="btn btn--primary btn--block btn--lg">I'm Ready</button>
+      </div>
+    </section>
 
-  <script src="game.js"></script>
+    <!-- ============= SCORING SCREEN ============= -->
+    <section id="screen-score" class="screen">
+      <header class="screen__head screen__head--center">
+        <p class="eyebrow">Judge: <span id="score-judge-name">Name</span></p>
+        <h2 class="screen__title">Rate <span id="score-performer-name">Fighter</span></h2>
+      </header>
+      <div class="score-categories" id="score-categories"></div>
+      <footer class="screen__foot">
+        <button id="score-submit" class="btn btn--primary btn--block btn--lg" disabled>Submit Scores</button>
+      </footer>
+    </section>
+
+    <!-- ============= ROUND RESULTS SCREEN ============= -->
+    <section id="screen-round-results" class="screen">
+      <header class="screen__head screen__head--center">
+        <p class="eyebrow" id="results-round-label">Round 1 complete</p>
+        <h2 class="screen__title">Standings</h2>
+      </header>
+      <div class="achievements" id="round-achievements"></div>
+      <ol id="round-standings" class="standings"></ol>
+      <footer class="screen__foot">
+        <button id="results-next" class="btn btn--primary btn--block btn--lg">Continue</button>
+      </footer>
+    </section>
+
+    <!-- ============= FINAL SCOREBOARD ============= -->
+    <section id="screen-final" class="screen">
+      <header class="screen__head screen__head--center">
+        <p class="eyebrow">Final Results</p>
+        <h2 class="screen__title">Champion Decided</h2>
+      </header>
+      <div class="winner" id="winner-card">
+        <div class="winner__belt" id="winner-belt"></div>
+        <div class="winner__crown" aria-hidden="true">★</div>
+        <h3 class="winner__name" id="winner-name">Champion</h3>
+        <p class="winner__title" id="winner-title">Karate Legend</p>
+        <p class="winner__score" id="winner-score">0</p>
+        <p class="winner__score-label">total points</p>
+      </div>
+      <ol id="final-standings" class="standings standings--final"></ol>
+      <div class="achievements" id="final-achievements"></div>
+      <footer class="screen__foot">
+        <button id="play-again" class="btn btn--primary btn--block btn--lg">Play Again</button>
+      </footer>
+    </section>
+
+  </main>
+
+  <!-- Confetti canvas overlay -->
+  <canvas id="confetti-canvas" aria-hidden="true"></canvas>
+
+  <!-- Toast container -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Scripts (order matters: data → audio → roulette → game → ui → main) -->
+  <script src="./js/data.js"></script>
+  <script src="./js/audio.js"></script>
+  <script src="./js/roulette.js"></script>
+  <script src="./js/game.js"></script>
+  <script src="./js/ui.js"></script>
+  <script src="./js/main.js"></script>
 </body>
 </html>

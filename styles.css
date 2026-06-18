@@ -1,0 +1,495 @@
+:root {
+  --bg: #09090f;
+  --panel: rgba(18, 19, 28, 0.82);
+  --panel-2: rgba(28, 31, 43, 0.9);
+  --line: rgba(255, 255, 255, 0.08);
+  --text: #f5f7ff;
+  --muted: #aab0c0;
+  --gold: #f7c948;
+  --red: #f05454;
+  --green: #46d39a;
+  --blue: #5da9ff;
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.4);
+  --radius: 24px;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; min-height: 100%; }
+body {
+  font-family: Inter, system-ui, sans-serif;
+  background:
+    radial-gradient(circle at top left, rgba(240, 84, 84, 0.12), transparent 25%),
+    radial-gradient(circle at top right, rgba(247, 201, 72, 0.12), transparent 28%),
+    linear-gradient(180deg, #07070c 0%, #0b0d15 100%);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+.bg-orb {
+  position: fixed;
+  width: 360px;
+  height: 360px;
+  border-radius: 50%;
+  filter: blur(70px);
+  opacity: 0.16;
+  pointer-events: none;
+}
+.orb-1 { background: var(--red); top: -120px; left: -120px; }
+.orb-2 { background: var(--gold); bottom: -150px; right: -120px; }
+
+.app-shell {
+  width: min(100%, 960px);
+  margin: 0 auto;
+  padding: 20px 14px 40px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero {
+  padding: 18px 4px 16px;
+}
+.hero-badge, .pill, .overlay-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid var(--line);
+}
+.pill.gold { background: rgba(247, 201, 72, 0.16); color: #ffe08a; }
+.hero h1 {
+  margin: 10px 0 8px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(3.1rem, 12vw, 5rem);
+  letter-spacing: 0.06em;
+  line-height: 0.95;
+}
+.hero p {
+  margin: 0;
+  color: var(--muted);
+  max-width: 34rem;
+  font-size: 0.98rem;
+  line-height: 1.5;
+}
+
+main { display: grid; gap: 16px; }
+.card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.05), transparent 18%), var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  padding: 16px;
+}
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+.card-head h2, .card-head h3, .combo-head h3 {
+  margin: 0;
+  line-height: 1.1;
+}
+.card-head p, .combo-head p, .judge-card label {
+  color: var(--muted);
+  margin: 6px 0 0;
+  font-size: 0.93rem;
+}
+.card-head.compact { margin-bottom: 10px; }
+
+.input-row, .setup-footer, .action-row {
+  display: flex;
+  gap: 10px;
+}
+.input-row { margin-top: 14px; }
+.setup-footer, .action-row { margin-top: 14px; }
+.setup-footer { justify-content: space-between; align-items: center; }
+
+input[type="text"], input[type="number"] {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  padding: 14px 15px;
+  font: inherit;
+  outline: none;
+}
+input::placeholder { color: #7c8295; }
+
+.btn, .time-chip {
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .18s ease, opacity .18s ease, background .18s ease, box-shadow .18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn { padding: 14px 16px; }
+.btn:hover, .time-chip:hover { transform: translateY(-1px); }
+.btn:active, .time-chip:active { transform: translateY(0); }
+.btn:disabled, .time-chip:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+.btn-primary {
+  background: linear-gradient(135deg, #f7c948, #f05454);
+  color: #160b0b;
+  box-shadow: 0 10px 28px rgba(240, 84, 84, 0.22);
+}
+.btn-ghost {
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.btn-large { padding-inline: 22px; }
+
+.player-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  min-height: 52px;
+}
+.player-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 13px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--line);
+  font-weight: 700;
+}
+.player-chip button {
+  border: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(240,84,84,0.16);
+  color: #ffbcbc;
+  cursor: pointer;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 16px 0;
+}
+
+.time-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.time-chip {
+  padding: 14px 12px;
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+.time-chip.active {
+  background: rgba(247, 201, 72, 0.16);
+  border-color: rgba(247, 201, 72, 0.45);
+  color: #ffe9a8;
+  box-shadow: inset 0 0 0 1px rgba(247, 201, 72, 0.1);
+}
+.custom-time-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+.custom-time-row label, .status-label, .timer-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.custom-time-row input { max-width: 180px; }
+
+.hidden { display: none !important; }
+
+.status-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.status-row > div, .timer-box, .roulette-ring, .judge-card, .final-card, .mini-leader {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+}
+.status-row > div {
+  padding: 12px;
+  text-align: center;
+}
+.status-value {
+  margin-top: 6px;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.mini-scoreboard {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.mini-leader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+}
+.mini-leader strong { font-size: 0.98rem; }
+.mini-leader span { color: var(--gold); font-weight: 800; }
+
+.roulette-panel, .combo-panel { margin-top: 10px; }
+.roulette-ring {
+  position: relative;
+  padding: 18px 14px 16px;
+  overflow: hidden;
+}
+.roulette-ring::before {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 18px;
+  border: 1px dashed rgba(255,255,255,0.08);
+}
+.roulette-pointer {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 18px solid var(--gold);
+  filter: drop-shadow(0 0 8px rgba(247, 201, 72, 0.45));
+}
+.roulette-title {
+  position: relative;
+  z-index: 1;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.78rem;
+}
+.roulette-name {
+  position: relative;
+  z-index: 1;
+  margin-top: 12px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+  min-height: 1em;
+  transition: transform .18s ease, opacity .18s ease;
+}
+.roulette-name.settled { transform: scale(1.06); color: #ffe9a8; }
+.roulette-state {
+  position: relative;
+  z-index: 1;
+  margin-top: 6px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.combo-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+.timer-box {
+  min-width: 92px;
+  padding: 12px;
+  text-align: center;
+}
+.timer-value {
+  margin-top: 6px;
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+.progress-track {
+  margin-top: 14px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+.progress-fill {
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--gold), var(--red));
+  transition: width .25s ease;
+}
+.combo-moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+.move-chip {
+  padding: 11px 12px;
+  border-radius: 999px;
+  background: rgba(247,201,72,0.10);
+  border: 1px solid rgba(247,201,72,0.26);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.move-chip.final {
+  background: rgba(240,84,84,0.14);
+  border-color: rgba(240,84,84,0.3);
+}
+
+.scoring-panel {
+  margin-top: 14px;
+  display: grid;
+  gap: 12px;
+}
+.scoring-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--line);
+}
+.scoring-header strong {
+  display: block;
+  font-size: 1.05rem;
+}
+.scoring-header span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.judge-card { padding: 14px; }
+.judge-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.judge-name { font-weight: 900; }
+.judge-points {
+  min-width: 44px;
+  text-align: right;
+  color: var(--gold);
+  font-weight: 900;
+}
+.rating-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+.rating-row label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text);
+  font-size: 0.9rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+.rating-value { color: var(--gold); font-weight: 800; }
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--gold);
+}
+.score-summary {
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(247,201,72,0.1);
+  border: 1px solid rgba(247,201,72,0.25);
+}
+.score-summary strong { display: block; font-size: 1.25rem; margin-top: 4px; }
+.score-details {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.final-board {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+.final-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+}
+.final-left {
+  display: grid;
+  gap: 4px;
+}
+.final-name { font-size: 1.03rem; font-weight: 900; }
+.final-meta { color: var(--muted); font-size: 0.9rem; }
+.final-score {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 2.1rem;
+  letter-spacing: 0.06em;
+}
+.final-card.winner {
+  background: rgba(247,201,72,0.16);
+  border-color: rgba(247,201,72,0.42);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 4, 8, 0.72);
+  backdrop-filter: blur(12px);
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.overlay-card {
+  width: min(100%, 420px);
+  border-radius: 28px;
+  padding: 22px 18px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+.overlay-card h2 {
+  margin: 12px 0 8px;
+  font-size: 1.9rem;
+}
+.spinner-card .spin-name {
+  margin: 18px auto 8px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: clamp(3rem, 15vw, 4.8rem);
+  color: #ffe9a8;
+  letter-spacing: 0.08em;
+}
+.overlay-card p { color: var(--muted); margin: 0; }
+
+@media (min-width: 720px) {
+  .app-shell { padding: 34px 20px 48px; }
+  .time-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .setup-footer { justify-content: flex-end; }
+  .setup-footer .btn-ghost { margin-right: auto; }
+  .final-board { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
