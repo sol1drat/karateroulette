@@ -145,10 +145,7 @@ ol, ul { list-style: none; }
   letter-spacing: 0.04em;
   line-height: 1;
   margin-top: 2px;
-  background: linear-gradient(180deg, #fff 0%, #d4d4d8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #fff;
 }
 
 .setup-body {
@@ -161,7 +158,7 @@ ol, ul { list-style: none; }
 }
 
 .setup-section {
-  background: linear-gradient(180deg, var(--surface), var(--bg-2));
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 12px 14px;
@@ -309,7 +306,7 @@ ol, ul { list-style: none; }
 }
 .time-chip:hover { border-color: var(--crimson); color: var(--text); }
 .time-chip.is-active {
-  background: linear-gradient(180deg, var(--crimson-bright), var(--crimson));
+  background: var(--crimson);
   border-color: var(--crimson);
   color: #fff;
 }
@@ -528,7 +525,7 @@ ol, ul { list-style: none; }
   align-items: center;
   gap: 12px;
   padding: 10px 14px;
-  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  background: var(--surface-2);
   border: 1px solid var(--border-strong);
   border-radius: var(--radius);
   counter-increment: move;
@@ -609,7 +606,7 @@ ol, ul { list-style: none; }
 .score-categories::-webkit-scrollbar-thumb { background: var(--surface-3); border-radius: 2px; }
 
 .score-cat {
-  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 12px 14px;
@@ -655,7 +652,7 @@ ol, ul { list-style: none; }
 }
 .star:hover { border-color: var(--gold); }
 .star.is-on {
-  background: linear-gradient(180deg, rgba(251, 191, 36, 0.25), rgba(251, 191, 36, 0.1));
+  background: rgba(251, 191, 36, 0.18);
   border-color: var(--gold);
   color: var(--gold);
   transform: translateY(-1px);
@@ -704,7 +701,7 @@ ol, ul { list-style: none; }
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  background: linear-gradient(180deg, var(--surface-2), var(--surface));
+  background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   animation: row-in 0.3s ease backwards;
@@ -719,7 +716,7 @@ ol, ul { list-style: none; }
 
 .standing-row.is-1st {
   border-color: var(--gold);
-  background: linear-gradient(180deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.02));
+  background: rgba(251, 191, 36, 0.10);
 }
 .standing-row.is-2nd { border-color: rgba(203, 213, 225, 0.3); }
 .standing-row.is-3rd { border-color: rgba(180, 83, 9, 0.4); }
@@ -789,7 +786,7 @@ ol, ul { list-style: none; }
   padding: 16px 14px;
   margin-bottom: 8px;
   position: relative;
-  background: linear-gradient(180deg, rgba(251, 191, 36, 0.10), rgba(251, 191, 36, 0.02));
+  background: rgba(251, 191, 36, 0.06);
   border: 1px solid rgba(251, 191, 36, 0.4);
   border-radius: var(--radius-lg);
   animation: winner-in 0.8s cubic-bezier(0.2, 1.4, 0.4, 1);
@@ -804,7 +801,7 @@ ol, ul { list-style: none; }
   height: 12px;
   margin: 0 auto 6px;
   border-radius: 99px;
-  background: linear-gradient(90deg, #1a1a1a 0%, #1a1a1a 50%, var(--gold) 50%, var(--gold) 100%);
+  background: var(--gold);
 }
 .winner__crown {
   font-size: 40px;
@@ -876,10 +873,10 @@ ol, ul { list-style: none; }
 .btn--icon { width: 44px; height: 44px; padding: 0; flex-shrink: 0; }
 
 .btn--primary {
-  background: linear-gradient(180deg, var(--crimson-bright), var(--crimson));
+  background: var(--crimson);
   color: #fff;
 }
-.btn--primary:hover:not(:disabled) { background: linear-gradient(180deg, var(--crimson), var(--crimson-deep)); }
+.btn--primary:hover:not(:disabled) { background: var(--crimson-deep); }
 
 /* =========================================================
    Confetti
