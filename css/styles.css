@@ -1,6 +1,6 @@
 /* =========================================================
    Karate Roulette — Stylesheet
-   Full-screen mobile pages. No scrolling. Clean transitions.
+   Full-screen mobile pages. Minimalist. No glows.
    ========================================================= */
 
 :root {
@@ -26,10 +26,7 @@
   --green: #10b981;
   --blue: #3b82f6;
 
-  --glow-crimson: 0 0 30px rgba(225, 29, 46, 0.45);
-  --glow-gold: 0 0 30px rgba(251, 191, 36, 0.4);
-  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.45);
-  --shadow-pop: 0 20px 60px rgba(0, 0, 0, 0.6);
+  --shadow-card: 0 4px 16px rgba(0, 0, 0, 0.35);
 
   --font-display: 'Bebas Neue', 'Inter', sans-serif;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -47,7 +44,7 @@
 html, body {
   height: 100%;
   width: 100%;
-  overflow: hidden; /* No body scroll ever */
+  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
   user-select: none;
@@ -59,10 +56,7 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.5;
-  background-image:
-    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(225, 29, 46, 0.18), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 50% 110%, rgba(251, 191, 36, 0.08), transparent 60%);
-  background-attachment: fixed;
+  /* No background glows — just a flat dark bg */
   height: 100dvh;
   padding-top: var(--safe-top);
   padding-bottom: var(--safe-bottom);
@@ -98,7 +92,7 @@ ol, ul { list-style: none; }
   overflow: hidden;
 }
 
-/* ============= Screen base — every screen is exactly 100dvh, no scroll ============= */
+/* ============= Screen base ============= */
 .screen {
   display: none;
   flex-direction: column;
@@ -125,7 +119,7 @@ ol, ul { list-style: none; }
 }
 
 /* =========================================================
-   SETUP SCREEN — fits entirely on one phone screen
+   SETUP SCREEN
    ========================================================= */
 .screen--setup {
   justify-content: space-between;
@@ -143,7 +137,6 @@ ol, ul { list-style: none; }
   font-size: 40px;
   color: var(--crimson);
   letter-spacing: 0.1em;
-  text-shadow: 0 0 24px rgba(225, 29, 46, 0.5);
   line-height: 1;
 }
 .logo__title {
@@ -157,21 +150,13 @@ ol, ul { list-style: none; }
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-.logo__subtitle {
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  margin-top: 4px;
-  font-weight: 500;
-}
 
 .setup-body {
   flex: 1;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  min-height: 0; /* allow children to scroll internally if needed */
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -180,6 +165,19 @@ ol, ul { list-style: none; }
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 12px 14px;
+}
+
+/* Fighters section grows to fill available space */
+.setup-section--fighters {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Combo-time section always pinned, never pushed off-screen */
+.setup-section--time {
   flex-shrink: 0;
 }
 
@@ -204,7 +202,7 @@ ol, ul { list-style: none; }
 }
 
 /* Add-player form */
-.add-player { display: flex; gap: 8px; margin-bottom: 10px; }
+.add-player { display: flex; gap: 8px; margin-bottom: 10px; flex-shrink: 0; }
 .input {
   flex: 1;
   height: 44px;
@@ -221,12 +219,13 @@ ol, ul { list-style: none; }
 .input::placeholder { color: var(--text-faint); }
 .input:focus { border-color: var(--crimson); background: var(--surface-3); }
 
-/* Player list — scrolls internally if it overflows, never the screen */
+/* Player list — flexes to fill the fighters section, scrolls internally */
 .player-list {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 200px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding-right: 2px;
@@ -244,6 +243,7 @@ ol, ul { list-style: none; }
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   animation: row-in 0.3s ease;
+  flex-shrink: 0;
 }
 @keyframes row-in {
   from { opacity: 0; transform: translateX(-8px); }
@@ -287,6 +287,7 @@ ol, ul { list-style: none; }
   color: var(--text-faint);
   padding: 4px 0;
   font-style: italic;
+  flex-shrink: 0;
 }
 
 /* Time chips */
@@ -311,7 +312,6 @@ ol, ul { list-style: none; }
   background: linear-gradient(180deg, var(--crimson-bright), var(--crimson));
   border-color: var(--crimson);
   color: #fff;
-  box-shadow: var(--glow-crimson);
 }
 
 .setup-foot {
@@ -331,55 +331,25 @@ ol, ul { list-style: none; }
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
   max-width: 360px;
 }
 
-/* Round intro */
-.round-eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--gold);
-  font-weight: 700;
-}
+/* Round intro — now just "ROUND N OF 3" + small moves label */
 .round-title {
   font-family: var(--font-display);
-  font-size: clamp(56px, 16vw, 88px);
-  letter-spacing: 0.02em;
-  line-height: 0.95;
-  background: linear-gradient(180deg, #fff, #888);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin: 4px 0 4px;
-}
-.round-moves {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 8px 0;
-}
-.round-moves__num {
-  font-family: var(--font-display);
-  font-size: 96px;
+  font-size: clamp(44px, 12vw, 64px);
+  letter-spacing: 0.04em;
   line-height: 1;
-  color: var(--crimson);
-  text-shadow: var(--glow-crimson);
-}
-.round-moves__label {
-  font-size: 11px;
-  letter-spacing: 0.18em;
+  color: var(--text);
   text-transform: uppercase;
-  color: var(--text-dim);
-  margin-top: 4px;
 }
-.round-desc {
+.round-moves-label {
   font-size: 14px;
   color: var(--text-dim);
-  max-width: 280px;
-  margin-bottom: 20px;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
 }
 
 /* Pass phone */
@@ -447,15 +417,6 @@ ol, ul { list-style: none; }
   display: grid;
   place-items: center;
 }
-.roulette-wrap::before {
-  content: '';
-  position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(225, 29, 46, 0.28), transparent 70%);
-  z-index: 0;
-  pointer-events: none;
-}
 #roulette-canvas {
   width: 100%;
   height: 100%;
@@ -464,16 +425,16 @@ ol, ul { list-style: none; }
   z-index: 1;
   display: block;
 }
+/* Pointer is inside the wrap, sitting right on top of the wheel */
 .roulette-pointer {
   position: absolute;
-  top: -2px;
+  top: -10px;
   left: 50%;
   transform: translateX(-50%);
   width: 0; height: 0;
-  border-left: 14px solid transparent;
-  border-right: 14px solid transparent;
-  border-top: 22px solid var(--gold);
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-top: 20px solid var(--gold);
   z-index: 3;
 }
 
@@ -481,16 +442,9 @@ ol, ul { list-style: none; }
   flex-shrink: 0;
   text-align: center;
 }
-.roulette-status {
-  font-size: 13px;
-  color: var(--text-dim);
-  margin-bottom: 10px;
-  letter-spacing: 0.06em;
-  min-height: 18px;
-}
 
 /* =========================================================
-   PERFORMANCE SCREEN — combo + timer combined, fits 100dvh
+   PERFORMANCE SCREEN — combo + timer combined
    ========================================================= */
 .screen--perform {
   justify-content: space-between;
@@ -505,15 +459,6 @@ ol, ul { list-style: none; }
   margin-bottom: 6px;
   font-size: 12px;
 }
-.combo-difficulty {
-  display: flex;
-  gap: 4px;
-  justify-content: center;
-  font-size: 18px;
-  color: var(--gold);
-  letter-spacing: 4px;
-}
-.combo-difficulty .star-off { color: var(--surface-3); }
 
 .perform-timer {
   flex-shrink: 0;
@@ -543,10 +488,9 @@ ol, ul { list-style: none; }
   stroke-dasharray: 578;
   stroke-dashoffset: 0;
   transition: stroke-dashoffset 1s linear, stroke 0.4s;
-  filter: drop-shadow(0 0 8px rgba(225, 29, 46, 0.6));
 }
-.timer-ring__progress.is-warning { stroke: var(--gold); filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.7)); }
-.timer-ring__progress.is-danger { stroke: #ef4444; filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.8)); animation: throb 0.6s ease-in-out infinite alternate; }
+.timer-ring__progress.is-warning { stroke: var(--gold); }
+.timer-ring__progress.is-danger { stroke: #ef4444; animation: throb 0.6s ease-in-out infinite alternate; }
 @keyframes throb {
   from { stroke-width: 8; }
   to   { stroke-width: 11; }
@@ -609,7 +553,6 @@ ol, ul { list-style: none; }
   display: grid; place-items: center;
   font-weight: 800;
   font-size: 14px;
-  box-shadow: var(--glow-crimson);
 }
 .combo-moves__text {
   flex: 1;
@@ -676,7 +619,7 @@ ol, ul { list-style: none; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 4px;
+  margin-bottom: 10px;
 }
 .score-cat__name {
   font-family: var(--font-display);
@@ -691,7 +634,6 @@ ol, ul { list-style: none; }
   min-width: 30px;
   text-align: right;
 }
-.score-cat__desc { font-size: 11px; color: var(--text-faint); margin-bottom: 8px; }
 
 .stars {
   display: flex;
@@ -716,7 +658,6 @@ ol, ul { list-style: none; }
   background: linear-gradient(180deg, rgba(251, 191, 36, 0.25), rgba(251, 191, 36, 0.1));
   border-color: var(--gold);
   color: var(--gold);
-  box-shadow: 0 0 14px rgba(251, 191, 36, 0.3);
   transform: translateY(-1px);
 }
 
@@ -731,7 +672,7 @@ ol, ul { list-style: none; }
   justify-content: space-between;
   gap: 10px;
 }
-.results-header, .final-foot {
+.results-header {
   flex-shrink: 0;
   text-align: center;
   padding-top: 4px;
@@ -743,31 +684,6 @@ ol, ul { list-style: none; }
   line-height: 1;
   color: var(--text);
   margin-top: 2px;
-}
-
-.achievements {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  flex-shrink: 0;
-}
-.achievements:empty { display: none; }
-.achievement {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 5px 10px;
-  background: linear-gradient(180deg, rgba(251, 191, 36, 0.18), rgba(251, 191, 36, 0.06));
-  border: 1px solid rgba(251, 191, 36, 0.4);
-  border-radius: 99px;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--gold);
-  animation: pop 0.4s cubic-bezier(0.2, 1.6, 0.5, 1);
-}
-@keyframes pop {
-  from { transform: scale(0.7); opacity: 0; }
-  to   { transform: scale(1); opacity: 1; }
 }
 
 .standings {
@@ -803,8 +719,7 @@ ol, ul { list-style: none; }
 
 .standing-row.is-1st {
   border-color: var(--gold);
-  background: linear-gradient(180deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.03));
-  box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.02));
 }
 .standing-row.is-2nd { border-color: rgba(203, 213, 225, 0.3); }
 .standing-row.is-3rd { border-color: rgba(180, 83, 9, 0.4); }
@@ -844,12 +759,13 @@ ol, ul { list-style: none; }
 .standing-row__belt {
   font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   padding: 3px 8px;
   border-radius: 99px;
   margin-right: 2px;
   flex-shrink: 0;
+  white-space: nowrap;
 }
 .standing-row__score {
   font-family: var(--font-display);
@@ -873,15 +789,14 @@ ol, ul { list-style: none; }
   padding: 16px 14px;
   margin-bottom: 8px;
   position: relative;
-  background: linear-gradient(180deg, rgba(251, 191, 36, 0.12), rgba(251, 191, 36, 0.02));
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.10), rgba(251, 191, 36, 0.02));
   border: 1px solid rgba(251, 191, 36, 0.4);
   border-radius: var(--radius-lg);
-  box-shadow: var(--glow-gold);
   animation: winner-in 0.8s cubic-bezier(0.2, 1.4, 0.4, 1);
   flex-shrink: 0;
 }
 @keyframes winner-in {
-  from { transform: scale(0.85); opacity: 0; }
+  from { transform: scale(0.92); opacity: 0; }
   to   { transform: scale(1); opacity: 1; }
 }
 .winner__belt {
@@ -890,18 +805,11 @@ ol, ul { list-style: none; }
   margin: 0 auto 6px;
   border-radius: 99px;
   background: linear-gradient(90deg, #1a1a1a 0%, #1a1a1a 50%, var(--gold) 50%, var(--gold) 100%);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 .winner__crown {
   font-size: 40px;
   color: var(--gold);
   line-height: 1;
-  text-shadow: 0 0 30px rgba(251, 191, 36, 0.7);
-  animation: crown-glow 1.6s ease-in-out infinite alternate;
-}
-@keyframes crown-glow {
-  from { text-shadow: 0 0 18px rgba(251, 191, 36, 0.5); transform: scale(1); }
-  to   { text-shadow: 0 0 38px rgba(251, 191, 36, 0.9); transform: scale(1.08); }
 }
 .winner__eyebrow {
   font-size: 10px;
@@ -933,7 +841,6 @@ ol, ul { list-style: none; }
   font-size: 52px;
   line-height: 1;
   color: var(--text);
-  text-shadow: var(--glow-gold);
 }
 .winner__score-label {
   font-size: 10px;
@@ -944,7 +851,7 @@ ol, ul { list-style: none; }
 }
 
 /* =========================================================
-   Buttons
+   Buttons — no glow
    ========================================================= */
 .btn {
   display: inline-flex;
@@ -957,7 +864,7 @@ ol, ul { list-style: none; }
   font-weight: 700;
   font-size: 15px;
   letter-spacing: 0.04em;
-  transition: transform 0.12s, box-shadow 0.2s, background 0.2s, opacity 0.2s;
+  transition: transform 0.12s, background 0.2s, opacity 0.2s;
   -webkit-user-select: none;
   user-select: none;
 }
@@ -971,9 +878,8 @@ ol, ul { list-style: none; }
 .btn--primary {
   background: linear-gradient(180deg, var(--crimson-bright), var(--crimson));
   color: #fff;
-  box-shadow: 0 6px 20px rgba(225, 29, 46, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
-.btn--primary:hover:not(:disabled) { box-shadow: 0 8px 28px rgba(225, 29, 46, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.2); }
+.btn--primary:hover:not(:disabled) { background: linear-gradient(180deg, var(--crimson), var(--crimson-deep)); }
 
 /* =========================================================
    Confetti
@@ -1021,7 +927,7 @@ ol, ul { list-style: none; }
 .toast--crimson { border-color: var(--crimson); color: var(--crimson-bright); }
 
 /* =========================================================
-   Responsive — slightly larger padding on bigger phones
+   Responsive
    ========================================================= */
 @media (min-height: 740px) {
   .screen { padding: 20px 20px calc(20px + var(--safe-bottom)); }
@@ -1032,7 +938,6 @@ ol, ul { list-style: none; }
   .time-options { grid-template-columns: repeat(6, 1fr); }
 }
 
-/* Reduce motion preference */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

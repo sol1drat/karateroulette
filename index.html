@@ -22,11 +22,10 @@
       <header class="setup-header">
         <span class="logo__kanji">空手</span>
         <h1 class="logo__title">Karate Roulette</h1>
-        <p class="logo__subtitle">Spin. Strike. Get scored.</p>
       </header>
 
       <div class="setup-body">
-        <div class="setup-section">
+        <div class="setup-section setup-section--fighters">
           <div class="setup-section__head">
             <h2 class="setup-section__title">Fighters</h2>
             <span class="setup-section__hint" id="player-count">0 added</span>
@@ -50,7 +49,7 @@
           <p id="player-empty" class="empty-state">Add at least 2 fighters to begin.</p>
         </div>
 
-        <div class="setup-section">
+        <div class="setup-section setup-section--time">
           <div class="setup-section__head">
             <h2 class="setup-section__title">Combo Time</h2>
             <span class="setup-section__hint">Per performer</span>
@@ -74,13 +73,8 @@
     <!-- ============= ROUND INTRO SCREEN ============= -->
     <section id="screen-round-intro" class="screen screen--center">
       <div class="center-stack">
-        <p class="round-eyebrow" id="round-eyebrow">Round 1 of 3</p>
-        <h2 class="round-title" id="round-title">Foundation</h2>
-        <div class="round-moves">
-          <span class="round-moves__num" id="round-moves-num">2</span>
-          <span class="round-moves__label">moves per combo</span>
-        </div>
-        <p class="round-desc" id="round-desc">Short, sharp combinations. Focus on form.</p>
+        <h2 class="round-title" id="round-title">Round 1 of 3</h2>
+        <p class="round-moves-label" id="round-moves-label">2 moves per combo</p>
         <button id="round-start" class="btn btn--primary btn--block btn--lg">Start Round</button>
       </div>
     </section>
@@ -89,16 +83,15 @@
     <section id="screen-roulette" class="screen screen--roulette">
       <header class="roulette-header">
         <p class="eyebrow" id="roulette-round-label">Round 1</p>
-        <h2 class="roulette-title" id="roulette-title">Spinning for a fighter…</h2>
+        <h2 class="roulette-title" id="roulette-title">Spinning for a fighter</h2>
       </header>
       <div class="roulette-stage">
-        <div class="roulette-pointer"></div>
         <div class="roulette-wrap">
+          <div class="roulette-pointer"></div>
           <canvas id="roulette-canvas" aria-label="Roulette wheel"></canvas>
         </div>
       </div>
       <footer class="roulette-foot">
-        <p class="roulette-status" id="roulette-status">Tap to spin!</p>
         <button id="spin-btn" class="btn btn--primary btn--block btn--lg">SPIN</button>
       </footer>
     </section>
@@ -109,7 +102,6 @@
         <p class="eyebrow perform-header__eyebrow">
           <span id="perform-fighter">Fighter</span> · <span id="perform-round">Round 1</span>
         </p>
-        <div class="combo-difficulty" id="combo-difficulty"></div>
       </header>
 
       <div class="perform-timer">
@@ -160,7 +152,6 @@
         <p class="eyebrow" id="results-round-label">Round 1 complete</p>
         <h2 class="results-title">Standings</h2>
       </header>
-      <div class="achievements" id="round-achievements"></div>
       <ol id="round-standings" class="standings"></ol>
       <footer class="results-foot">
         <button id="results-next" class="btn btn--primary btn--block btn--lg">Continue</button>
@@ -179,7 +170,6 @@
         <p class="winner__score-label">total points</p>
       </div>
       <ol id="final-standings" class="standings standings--final"></ol>
-      <div class="achievements" id="final-achievements"></div>
       <footer class="final-foot">
         <button id="play-again" class="btn btn--primary btn--block btn--lg">Play Again</button>
       </footer>

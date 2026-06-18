@@ -88,15 +88,12 @@
   // =========================================================
 
   const spinBtn = document.getElementById('spin-btn');
-  const rouletteStatus = document.getElementById('roulette-status');
 
   function goToRoulette() {
     const remaining = Game.getRemainingPerformers();
     UI.renderRoulette(remaining);
     spinBtn.disabled = false;
     spinBtn.style.display = '';
-    rouletteStatus.textContent =
-      remaining.length > 1 ? 'Tap to spin!' : 'One fighter left — spin!';
     UI.show('roulette');
   }
 
@@ -109,7 +106,6 @@
 
     spinBtn.disabled = true;
     spinBtn.style.display = 'none';
-    rouletteStatus.textContent = 'Spinning…';
 
     const pickIdx = Math.floor(Math.random() * remaining.length);
     const chosenPlayer = remaining[pickIdx];
@@ -117,7 +113,6 @@
     Roulette.spinTo(pickIdx, () => {
       // Set chosen performer (remove from available, set current)
       Game.setChosenPerformer(chosenPlayer.id);
-      rouletteStatus.textContent = `${chosenPlayer.name} is up!`;
       setTimeout(() => goToPerform(), 900);
     });
   }
@@ -204,7 +199,7 @@
     const round = Game.getCurrentRound();
     const result = Game.endRound();
     Audio.roundComplete();
-    UI.renderRoundResults(round, result.standings, result.newAchievements);
+    UI.renderRoundResults(round, result.standings);
     UI.show('roundResults');
   }
 
@@ -224,7 +219,7 @@
 
   function finishMatch() {
     const result = Game.getFinalStandings();
-    UI.renderFinal(result.standings, result.winner, result.newAchievements);
+    UI.renderFinal(result.standings, result.winner);
     UI.show('final');
     setTimeout(() => {
       Audio.victory();

@@ -80,18 +80,14 @@ const UI = (function () {
   // ---- Round intro ----
   function renderRoundIntro(round) {
     const r = KarateData.getRound(round);
-    document.getElementById('round-eyebrow').textContent = `Round ${round} of 3`;
-    document.getElementById('round-title').textContent = r.title;
-    document.getElementById('round-moves-num').textContent = r.moves;
-    document.getElementById('round-desc').textContent = r.desc;
+    document.getElementById('round-title').textContent = `Round ${round} of 3`;
+    document.getElementById('round-moves-label').textContent = `${r.moves} moves per combo`;
   }
 
   // ---- Roulette ----
   function renderRoulette(remainingPerformers) {
     document.getElementById('roulette-round-label').textContent = `Round ${Game.getCurrentRound()}`;
     Roulette.setPlayers(remainingPerformers.map(p => p.name));
-    document.getElementById('roulette-status').textContent =
-      remainingPerformers.length > 1 ? 'Tap to spin!' : 'One fighter left — spin!';
   }
 
   // ---- Performance / timer + combo combined ----
@@ -99,16 +95,6 @@ const UI = (function () {
     // Header: fighter name + round
     document.getElementById('perform-fighter').textContent = performer.name;
     document.getElementById('perform-round').textContent = `Round ${round}`;
-
-    // Difficulty stars
-    const diffEl = document.getElementById('combo-difficulty');
-    diffEl.innerHTML = '';
-    for (let i = 1; i <= 3; i++) {
-      const star = document.createElement('span');
-      star.textContent = '★';
-      star.className = i <= combo.stars ? '' : 'star-off';
-      diffEl.appendChild(star);
-    }
 
     // Combo moves
     const movesEl = document.getElementById('perform-moves');
@@ -205,9 +191,9 @@ const UI = (function () {
     document.getElementById('score-performer-name').textContent = performer.name;
 
     const cats = [
-      { key: 'accuracy', name: 'Accuracy', desc: 'Did each move hit the right target with proper form?' },
-      { key: 'power',    name: 'Power',    desc: 'Was there real force behind every strike?' },
-      { key: 'style',    name: 'Style',    desc: 'Crisp, confident, controlled — did it look good?' },
+      { key: 'accuracy', name: 'Accuracy' },
+      { key: 'power',    name: 'Power' },
+      { key: 'style',    name: 'Style' },
     ];
 
     const container = document.getElementById('score-categories');
@@ -222,7 +208,6 @@ const UI = (function () {
           <span class="score-cat__name">${cat.name}</span>
           <span class="score-cat__value" data-value="${cat.key}">0</span>
         </div>
-        <p class="score-cat__desc">${cat.desc}</p>
         <div class="stars" data-cat="${cat.key}" role="radiogroup" aria-label="${cat.name} rating">
           ${[1,2,3,4,5,6,7,8,9,10].map(n => `
             <button class="star" data-val="${n}" role="radio" aria-checked="false" aria-label="${n}">${n}</button>
@@ -263,24 +248,8 @@ const UI = (function () {
   function getScoreValues() { return UI._scoreValues; }
 
   // ---- Round results ----
-  function renderRoundResults(round, standings, newAchievements) {
+  function renderRoundResults(round, standings) {
     document.getElementById('results-round-label').textContent = `Round ${round} complete`;
-
-    // Achievements unlocked this round
-    const achEl = document.getElementById('round-achievements');
-    achEl.innerHTML = '';
-    if (newAchievements && newAchievements.length) {
-      newAchievements.forEach(({ player, achId }) => {
-        const ach = KarateData.getAchievement(achId);
-        if (!ach) return;
-        const el = document.createElement('div');
-        el.className = 'achievement';
-        el.innerHTML = `${ach.icon} <strong>${escapeHtml(player.name)}</strong> · ${ach.label}`;
-        el.title = ach.desc;
-        achEl.appendChild(el);
-      });
-      Audio.achievement();
-    }
 
     const list = document.getElementById('round-standings');
     list.innerHTML = '';
@@ -305,7 +274,7 @@ const UI = (function () {
   }
 
   // ---- Final scoreboard ----
-  function renderFinal(standings, winner, newAchievements) {
+  function renderFinal(standings, winner) {
     // Winner card
     const belt = KarateData.getBelt(winner.totalScore);
     const title = KarateData.getWinnerTitle(winner.totalScore);
@@ -337,26 +306,11 @@ const UI = (function () {
         <div class="standing-row__rank">${rank}</div>
         <div class="standing-row__avatar" style="background:${row.player.color}">${escapeHtml(row.player.initials)}</div>
         <div class="standing-row__name">${escapeHtml(row.player.name)}</div>
-        <div class="standing-row__belt" style="background:${playerBelt.color}; color:${playerBelt.text}">${playerBelt.short}</div>
+        <div class="standing-row__belt" style="background:${playerBelt.color}; color:${playerBelt.text}">${playerBelt.name}</div>
         <div class="standing-row__score">${row.player.totalScore}</div>
       `;
       list.appendChild(li);
     });
-
-    // Final achievements
-    const achEl = document.getElementById('final-achievements');
-    achEl.innerHTML = '';
-    if (newAchievements && newAchievements.length) {
-      newAchievements.forEach(({ player, achId }) => {
-        const ach = KarateData.getAchievement(achId);
-        if (!ach) return;
-        const el = document.createElement('div');
-        el.className = 'achievement';
-        el.innerHTML = `${ach.icon} <strong>${escapeHtml(player.name)}</strong> · ${ach.label}`;
-        el.title = ach.desc;
-        achEl.appendChild(el);
-      });
-    }
   }
 
   // ---- Confetti ----
