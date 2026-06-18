@@ -1,5 +1,7 @@
 /* =========================================================
-   roulette.js — Canvas roulette wheel with smooth deceleration
+   roulette.js — Canvas roulette wheel
+   - High-DPI rendering for crisp text (no more blur)
+   - Smooth deceleration with guaranteed landing
    ========================================================= */
 
 const Roulette = (function () {
@@ -8,14 +10,38 @@ const Roulette = (function () {
   const ctx = canvas.getContext('2d');
   const wrap = canvas.parentElement;
 
-  let segments = [];      // [{ name, color }]
-  let rotation = 0;       // current rotation in radians
+  let segments = [];
+  let rotation = 0;
   let spinning = false;
-  let targetIndex = 0;
   let onDoneCb = null;
   let lastTickAngle = 0;
+  let dpr = 1;
 
-  // Build the segments list from a list of player names
+  // High-DPI sizing: set canvas backing store to actual pixels
+  function resizeCanvas() {
+    dpr = Math.max(1, window.devicePixelRatio || 1);
+    const rect = canvas.getBoundingClientRect();
+    const size = Math.max(1, Math.min(rect.width, rect.height));
+    if (size <= 0) return;
+    canvas.width = Math.round(size * dpr);
+    canvas.height = Math.round(size * dpr);
+    // Scale the context so we can draw in CSS pixels
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    draw();
+  }
+
+  // Watch for size changes
+  if (window.ResizeObserver) {
+    const ro = new ResizeObserver(() => resizeCanvas());
+    ro.observe(canvas);
+  } else {
+    window.addEventListener('resize', resizeCanvas);
+  }
+  // Also observe parent (initial layout)
+  if (window.ResizeObserver && wrap) {
+    new ResizeObserver(() => resizeCanvas()).observe(wrap);
+  }
+
   function setPlayers(names) {
     const palette = [
       '#e11d2e', '#fbbf24', '#3b82f6', '#10b981',
@@ -26,55 +52,39 @@ const Roulette = (function () {
       name,
       color: palette[i % palette.length],
     }));
+    resizeCanvas();
     draw();
   }
 
-  // The pointer is at the top (12 o'clock = angle -PI/2 in canvas coords).
-  // Segment i is drawn from `i*segAngle + rot - PI/2` going clockwise.
-  // Segment i's CENTER angle = `(i + 0.5) * segAngle + rot - PI/2`.
-  // For the center to be at the pointer (-PI/2): `(i + 0.5) * segAngle + rot ≡ 0 (mod 2π)`.
-  // So the segment under the pointer is the one whose center is closest to -PI/2.
   function getSegmentAtPointer(rot) {
     if (segments.length === 0) return 0;
     const segAngle = (Math.PI * 2) / segments.length;
-    // i ≈ -rot/segAngle - 0.5 (mod N)
     let i = Math.round(-rot / segAngle - 0.5);
     i = ((i % segments.length) + segments.length) % segments.length;
     return i;
   }
 
-  // Easing for deceleration
   function easeOutQuint(t) { return 1 - Math.pow(1 - t, 5); }
 
-  // Spin to a target player index — guaranteed to land on that segment.
   function spinTo(targetIdx, cb) {
     if (spinning || segments.length === 0) return;
     spinning = true;
-    targetIndex = targetIdx;
     onDoneCb = cb;
     wrap.classList.add('spinning');
+    if (wrap.parentElement) wrap.parentElement.classList.add('is-spinning');
 
     Audio.whoosh();
 
     const segAngle = (Math.PI * 2) / segments.length;
-
-    // Final rotation that puts targetIdx's CENTER at the pointer:
-    // (targetIdx + 0.5) * segAngle + finalRot ≡ 0 (mod 2π)
-    // → finalRot ≡ -(targetIdx + 0.5) * segAngle (mod 2π)
     const targetRot = -(targetIdx + 0.5) * segAngle;
-
-    // Minimal positive delta from current rotation to targetRot (mod 2π)
     const startRot = rotation;
     let delta = (targetRot - startRot) % (Math.PI * 2);
     if (delta < 0) delta += Math.PI * 2;
-
-    // Add 5–7 full rotations for drama
     const fullRotations = 5 + Math.floor(Math.random() * 3);
-    // Small jitter inside the segment so it doesn't land dead-center every time
     const jitter = (Math.random() - 0.5) * segAngle * 0.5;
     const totalDelta = fullRotations * Math.PI * 2 + delta + jitter;
 
-    const duration = 4200 + Math.random() * 800; // 4.2 - 5.0s
+    const duration = 4200 + Math.random() * 800;
     const startTime = performance.now();
     lastTickAngle = startRot;
 
@@ -84,12 +94,10 @@ const Roulette = (function () {
       rotation = startRot + totalDelta * eased;
       draw();
 
-      // Tick sounds as we pass segment boundaries
       const segAngleStep = (Math.PI * 2) / segments.length;
       const angleDiff = rotation - lastTickAngle;
       if (angleDiff >= segAngleStep) {
         const ticks = Math.floor(angleDiff / segAngleStep);
-        // Only play one tick per frame to avoid stutter
         Audio.tick();
         lastTickAngle += ticks * segAngleStep;
       }
@@ -99,15 +107,10 @@ const Roulette = (function () {
       } else {
         spinning = false;
         wrap.classList.remove('spinning');
+        if (wrap.parentElement) wrap.parentElement.classList.remove('is-spinning');
         Audio.ding();
-        // Small haptic
         if (navigator.vibrate) navigator.vibrate(60);
-        // Verify landing
-        const landedOn = getSegmentAtPointer(rotation);
-        // Safety: if we somehow landed on the wrong segment (shouldn't happen),
-        // still call the callback with the visually-landed index.
-        const finalIdx = (landedOn === targetIdx) ? targetIdx : landedOn;
-        // Reveal pause
+        const finalIdx = getSegmentAtPointer(rotation);
         setTimeout(() => {
           if (onDoneCb) onDoneCb(finalIdx);
         }, 700);
@@ -117,11 +120,12 @@ const Roulette = (function () {
   }
 
   function draw() {
-    const w = canvas.width;
-    const h = canvas.height;
+    const w = canvas.width / dpr;
+    const h = canvas.height / dpr;
+    if (w <= 0 || h <= 0) return;
     const cx = w / 2;
     const cy = h / 2;
-    const radius = Math.min(cx, cy) - 6;
+    const radius = Math.max(20, Math.min(cx, cy) - 4);
 
     ctx.clearRect(0, 0, w, h);
 
@@ -131,41 +135,34 @@ const Roulette = (function () {
 
     // Outer ring (bezel)
     ctx.beginPath();
-    ctx.arc(cx, cy, radius + 4, 0, Math.PI * 2);
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
     ctx.fillStyle = '#1a1a1f';
     ctx.fill();
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 4;
     ctx.strokeStyle = '#3a3a44';
     ctx.stroke();
 
-    // Inner glow ring
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius - 2, 0, Math.PI * 2);
-    ctx.strokeStyle = 'rgba(225, 29, 46, 0.4)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    const innerRadius = radius - 6;
 
     // Segments
     for (let i = 0; i < segments.length; i++) {
       const a0 = i * segAngle + rotation - Math.PI / 2;
       const a1 = a0 + segAngle;
 
-      // Segment fill
+      // Segment fill with radial gradient
       ctx.beginPath();
       ctx.moveTo(cx, cy);
-      ctx.arc(cx, cy, radius - 4, a0, a1);
+      ctx.arc(cx, cy, innerRadius, a0, a1);
       ctx.closePath();
-
-      // Gradient fill
-      const grad = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, radius);
+      const grad = ctx.createRadialGradient(cx, cy, innerRadius * 0.3, cx, cy, innerRadius);
       const c = segments[i].color;
       grad.addColorStop(0, c);
-      grad.addColorStop(1, shade(c, -25));
+      grad.addColorStop(1, shade(c, -28));
       ctx.fillStyle = grad;
       ctx.fill();
 
       // Divider
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
       ctx.lineWidth = 2;
       ctx.stroke();
 
@@ -173,25 +170,35 @@ const Roulette = (function () {
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(a0 + segAngle / 2);
+
+      // Font size scales with segment count — but stay legible (min 13px)
+      const fontSize = Math.max(13, Math.min(22, (innerRadius * 0.13) - segments.length * 0.4));
+      ctx.font = `700 ${fontSize}px Inter, system-ui, sans-serif`;
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
-      const fontSize = Math.max(14, Math.min(28, 240 / segments.length));
-      ctx.font = `700 ${fontSize}px Inter, sans-serif`;
-      ctx.fillStyle = '#fff';
-      ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+
+      // Truncate long names to fit
+      const maxChars = Math.max(5, Math.floor(innerRadius / (fontSize * 0.62)));
+      let label = segments[i].name;
+      if (label.length > maxChars) {
+        label = label.slice(0, maxChars - 1) + '…';
+      }
+
+      // Shadow for readability
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
       ctx.shadowBlur = 4;
-      // Truncate long names
-      const maxLen = Math.max(6, Math.floor(14 - segments.length / 2));
-      const label = segments[i].name.length > maxLen
-        ? segments[i].name.slice(0, maxLen) + '…'
-        : segments[i].name;
-      ctx.fillText(label, radius - 14, 0);
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 1;
+      ctx.fillStyle = '#fff';
+      ctx.fillText(label, innerRadius - 12, 0);
       ctx.restore();
     }
 
     // Center hub
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
     ctx.beginPath();
-    ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 26, 0, Math.PI * 2);
     ctx.fillStyle = '#0a0a0c';
     ctx.fill();
     ctx.lineWidth = 3;
@@ -200,12 +207,11 @@ const Roulette = (function () {
 
     // Inner dot
     ctx.beginPath();
-    ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+    ctx.arc(cx, cy, 7, 0, Math.PI * 2);
     ctx.fillStyle = '#e11d2e';
     ctx.fill();
   }
 
-  // Hex shade helper (positive = lighten, negative = darken)
   function shade(hex, percent) {
     const h = hex.replace('#', '');
     const r = parseInt(h.substring(0, 2), 16);
@@ -217,5 +223,8 @@ const Roulette = (function () {
 
   function isSpinning() { return spinning; }
 
-  return { setPlayers, spinTo, isSpinning, draw };
+  // Initial size — wait for next frame so layout is ready
+  setTimeout(resizeCanvas, 0);
+
+  return { setPlayers, spinTo, isSpinning, draw, resizeCanvas };
 })();

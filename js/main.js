@@ -118,35 +118,20 @@
       // Set chosen performer (remove from available, set current)
       Game.setChosenPerformer(chosenPlayer.id);
       rouletteStatus.textContent = `${chosenPlayer.name} is up!`;
-      setTimeout(() => goToCombo(), 900);
+      setTimeout(() => goToPerform(), 900);
     });
   }
 
   // =========================================================
-  // COMBO SCREEN
-  // =========================================================
-
-  function goToCombo() {
-    const performer = Game.getCurrentPerformer();
-    const combo = Game.generateCurrentCombo();
-    UI.renderCombo(performer, combo);
-    UI.show('combo');
-  }
-
-  document.getElementById('combo-ready').addEventListener('click', () => {
-    Audio.tap();
-    goToPerform();
-  });
-
-  // =========================================================
-  // PERFORMANCE SCREEN
+  // PERFORMANCE SCREEN (combo + timer combined)
   // =========================================================
 
   function goToPerform() {
     const performer = Game.getCurrentPerformer();
-    const combo = Game.getCurrentCombo();
+    const combo = Game.generateCurrentCombo();
     const duration = Game.getComboTime();
-    UI.renderPerform(performer, combo, duration);
+    const round = Game.getCurrentRound();
+    UI.renderPerform(performer, combo, duration, round);
     UI.onTimerEnd(() => goToJudging());
     UI.show('perform');
   }

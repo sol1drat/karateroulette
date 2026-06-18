@@ -8,7 +8,6 @@ const UI = (function () {
     setup:          document.getElementById('screen-setup'),
     roundIntro:     document.getElementById('screen-round-intro'),
     roulette:       document.getElementById('screen-roulette'),
-    combo:          document.getElementById('screen-combo'),
     perform:        document.getElementById('screen-perform'),
     pass:           document.getElementById('screen-pass'),
     score:          document.getElementById('screen-score'),
@@ -24,7 +23,14 @@ const UI = (function () {
   function show(screenKey) {
     Object.values(screens).forEach(s => s.classList.remove('is-active'));
     screens[screenKey].classList.add('is-active');
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    // Scroll any internal scroll areas back to top
+    screens[screenKey].querySelectorAll('.standings, .combo-moves, .score-categories, .player-list').forEach(el => {
+      el.scrollTop = 0;
+    });
+    // Force roulette redraw if showing roulette
+    if (screenKey === 'roulette') {
+      setTimeout(() => Roulette.resizeCanvas(), 50);
+    }
   }
 
   // ---- Toast ----
@@ -88,9 +94,11 @@ const UI = (function () {
       remainingPerformers.length > 1 ? 'Tap to spin!' : 'One fighter left — spin!';
   }
 
-  // ---- Combo reveal ----
-  function renderCombo(performer, combo) {
-    document.getElementById('combo-fighter-name').textContent = performer.name;
+  // ---- Performance / timer + combo combined ----
+  function renderPerform(performer, combo, duration, round) {
+    // Header: fighter name + round
+    document.getElementById('perform-fighter').textContent = performer.name;
+    document.getElementById('perform-round').textContent = `Round ${round}`;
 
     // Difficulty stars
     const diffEl = document.getElementById('combo-difficulty');
@@ -102,7 +110,8 @@ const UI = (function () {
       diffEl.appendChild(star);
     }
 
-    const movesEl = document.getElementById('combo-moves');
+    // Combo moves
+    const movesEl = document.getElementById('perform-moves');
     movesEl.innerHTML = '';
     combo.moves.forEach(m => {
       const li = document.createElement('li');
@@ -115,21 +124,7 @@ const UI = (function () {
       movesEl.appendChild(li);
     });
 
-    document.getElementById('combo-name').textContent = combo.name;
-  }
-
-  // ---- Performance / timer ----
-  function renderPerform(performer, combo, duration) {
-    document.getElementById('perform-fighter').textContent = performer.name;
-
-    const movesEl = document.getElementById('perform-moves');
-    movesEl.innerHTML = '';
-    combo.moves.forEach(m => {
-      const li = document.createElement('li');
-      li.innerHTML = `<div class="combo-moves__text">${escapeHtml(m.en)}</div>`;
-      movesEl.appendChild(li);
-    });
-
+    // Timer
     const label = document.getElementById('timer-label');
     const progress = document.getElementById('timer-progress');
 
@@ -436,7 +431,7 @@ const UI = (function () {
   return {
     screens, show, toast,
     renderPlayerList, renderRoundIntro, renderRoulette,
-    renderCombo, renderPerform, renderPass, renderScoring,
+    renderPerform, renderPass, renderScoring,
     renderRoundResults, renderFinal,
     stopTimer, onTimerEnd, getScoreValues,
     fireConfetti, escapeHtml,
